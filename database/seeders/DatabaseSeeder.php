@@ -37,27 +37,27 @@ class DatabaseSeeder extends Seeder
         }
 
         // 20 Dummy Products
-        for ($i = 1; $i <= 20; $i++) {
-            $baseName = 'Premium Digital Product ' . $i;
-            \App\Models\Product::create([
-                'category_id' => rand(1, 3),
-                'name' => $baseName,
-                'slug' => \Illuminate\Support\Str::slug($baseName) . '-' . uniqid(),
-                'url_key' => \Illuminate\Support\Str::slug($baseName),
-                'product_number' => 'PRD-' . str_pad($i, 4, '0', STR_PAD_LEFT),
-                'sku' => 'SKU-' . str_pad($i, 5, '0', STR_PAD_LEFT),
-                'description' => 'A beautifully crafted premium e-commerce item. Product #' . $i,
-                'price' => rand(5000, 150000),
-                'cost_price' => rand(2000, 4000),
-                'discount_price' => rand(0, 1) ? rand(1000, 4000) : null,
-                'stock' => rand(5, 50),
-                'status' => true,
-                'is_new' => $i <= 5,
-                'is_featured' => $i <= 3,
-                'visible_individually' => true,
-                'show_stock_level' => true,
-            ]);
-        }
+        // for ($i = 1; $i <= 20; $i++) {
+        //     $baseName = 'Premium Digital Product ' . $i;
+        //     \App\Models\Product::create([
+        //         'category_id' => rand(1, 3),
+        //         'name' => $baseName,
+        //         'slug' => \Illuminate\Support\Str::slug($baseName) . '-' . uniqid(),
+        //         'url_key' => \Illuminate\Support\Str::slug($baseName),
+        //         'product_number' => 'PRD-' . str_pad($i, 4, '0', STR_PAD_LEFT),
+        //         'sku' => 'SKU-' . str_pad($i, 5, '0', STR_PAD_LEFT),
+        //         'description' => 'A beautifully crafted premium e-commerce item. Product #' . $i,
+        //         'price' => rand(5000, 150000),
+        //         'cost_price' => rand(2000, 4000),
+        //         'discount_price' => rand(0, 1) ? rand(1000, 4000) : null,
+        //         'stock' => rand(5, 50),
+        //         'status' => true,
+        //         'is_new' => $i <= 5,
+        //         'is_featured' => $i <= 3,
+        //         'visible_individually' => true,
+        //         'show_stock_level' => true,
+        //     ]);
+        // }
 
         // Default Store Settings
         $defaults = [
