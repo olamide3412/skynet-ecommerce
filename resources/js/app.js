@@ -20,6 +20,8 @@ import FlashMessages from './Components/FlashMessages.vue';
 
 const pinia = createPinia();
 
+import { FontAwesomeIcon } from './fontawesome';
+
 createInertiaApp({
     title: (title) => `${title}`,
     resolve: (name) => {
@@ -47,23 +49,21 @@ createInertiaApp({
 
         app.component('Head', Head)
             .component('Link', Link)
-            .component('FlashMessages', FlashMessages);
+            .component('FlashMessages', FlashMessages)
+            .component('font-awesome-icon', FontAwesomeIcon);
 
-        // ✅ Dynamically import AOS to split the chunk
+        app.mount(el);
+
+        // ✅ Dynamically import AOS to split the chunk (Non-critical)
         import('aos').then((AOS) => {
-            AOS.default.init({
-                duration: 1000,
-                once: true,
-            });
-        });
-
-        // ✅ Dynamically import FontAwesome to split the chunk
-        import('./fontawesome').then(({ FontAwesomeIcon }) => {
-            app.component('font-awesome-icon', FontAwesomeIcon)
-            app.mount(el);
-        });
-
-        // app.mount(el)
+            const aos = AOS.default || AOS;
+            if (aos && aos.init) {
+                aos.init({
+                    duration: 1000,
+                    once: true,
+                });
+            }
+        }).catch(err => console.warn('AOS failed to load:', err));
     },
     progress: {
         delay: 250,
