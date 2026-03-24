@@ -5,6 +5,7 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\Frontend\ProductController as FrontProductController;
 use App\Http\Controllers\Frontend\CartController;
+use App\Http\Controllers\Frontend\CompareController;
 use App\Http\Controllers\Frontend\CheckoutController;
 use App\Http\Controllers\Frontend\OrderTrackingController;
 use App\Http\Controllers\Frontend\WishlistController;
@@ -42,6 +43,10 @@ Route::get('/cart', [CartController::class , 'index'])->name('cart.index');
 Route::post('/cart', [CartController::class , 'store'])->name('cart.store');
 Route::put('/cart/{cartItem}', [CartController::class , 'update'])->name('cart.update');
 Route::delete('/cart/{cartItem}', [CartController::class , 'destroy'])->name('cart.destroy');
+
+Route::get('/compare', [CompareController::class , 'index'])->name('compare.index');
+Route::post('/compare', [CompareController::class , 'store'])->name('compare.store');
+Route::delete('/compare/{compareItem}', [CompareController::class , 'destroy'])->name('compare.destroy');
 
 Route::get('/checkout', [CheckoutController::class , 'index'])->name('checkout.index');
 Route::post('/checkout/process', [CheckoutController::class , 'process'])->name('checkout.process');

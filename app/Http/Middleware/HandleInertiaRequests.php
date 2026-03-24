@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Inertia\Middleware;
 use App\Models\Cart;
+use App\Models\Compare;
 use App\Models\Category;
 use App\Models\StoreSetting;
 
@@ -62,6 +63,7 @@ class HandleInertiaRequests extends Middleware
             'csrf_token'     => csrf_token(),
             'turnstileSiteKey' => config('services.turnstile.site_key'),
             'cart_count'     => fn () => $this->getCartCount($request),
+            'compare_count'  => fn () => $this->getCompareCount($request),
             'store_settings' => fn () => StoreSetting::allAsArray(),
             'categories'     => fn () => \App\Models\Category::where('visible_in_menu', true)
                                     ->orderBy('menu_position')
@@ -108,6 +110,20 @@ class HandleInertiaRequests extends Middleware
                 $cart = Cart::where('session_id', $request->session()->getId())->first();
             }
             return $cart ? $cart->items()->sum('quantity') : 0;
+        } catch (\Throwable $e) {
+            return 0;
+        }
+    }
+
+    protected function getCompareCount(Request $request): int
+    {
+        try {
+            if (Auth::guard('customer')->check()) {
+                $compare = Compare::where('customer_id', Auth::guard('customer')->id())->first();
+            } else {
+                $compare = Compare::where('session_id', $request->session()->getId())->first();
+            }
+            return $compare ? $compare->items()->count() : 0;
         } catch (\Throwable $e) {
             return 0;
         }

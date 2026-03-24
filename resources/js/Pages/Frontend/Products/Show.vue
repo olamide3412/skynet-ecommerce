@@ -67,6 +67,16 @@ const addToCart = () => {
     });
 };
 
+const comparing = ref(false);
+const addToCompare = () => {
+    comparing.value = true;
+    useForm({ product_id: props.product.id }).post(route('compare.store'), {
+        preserveScroll: true,
+        onError: () => toast.error('Could not add to compare list.'),
+        onFinish: () => { comparing.value = false; },
+    });
+};
+
 const buyNow = () => {
     form.post(route('cart.store'), {
         preserveScroll: true,
@@ -200,6 +210,18 @@ const breadcrumbs = computed(() => {
                                 class="bg-gray-800 hover:bg-gray-900 dark:bg-blue-600 dark:hover:bg-blue-700 text-white font-bold transition flex-1 h-12 rounded-md disabled:opacity-50 disabled:cursor-not-allowed uppercase tracking-wide flex items-center justify-center gap-2 text-sm">
                                 <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path></svg>
                                 Add to Cart
+                            </button>
+
+                            <button @click="addToCompare" :disabled="comparing"
+                                title="Compare Product"
+                                class="h-12 w-12 flex-shrink-0 rounded-md bg-white hover:bg-blue-50 text-gray-600 hover:text-blue-600 dark:bg-gray-800 dark:hover:bg-gray-700 dark:text-gray-300 transition disabled:opacity-50 flex items-center justify-center border border-gray-300 dark:border-gray-600 shadow-sm">
+                                <svg v-if="!comparing" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"/>
+                                </svg>
+                                <svg v-else class="w-5 h-5 animate-spin" fill="none" viewBox="0 0 24 24">
+                                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
+                                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/>
+                                </svg>
                             </button>
                         </div>
                         <button @click="buyNow" 

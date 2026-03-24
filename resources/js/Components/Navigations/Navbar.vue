@@ -53,6 +53,7 @@ onUnmounted(() => document.removeEventListener('click', handleClickOutside));
 
 // ── Helpers ────────────────────────────────────────────────────
 const cartCount       = computed(() => page.props.cart_count ?? 0);
+const compareCount    = computed(() => page.props.compare_count ?? 0);
 const isCustomer      = computed(() => !!page.props.auth?.customer);
 const isStaff         = computed(() => !!page.props.auth?.user);
 const wishlistEnabled = computed(() => page.props.store_settings?.wishlist_enabled === '1');
@@ -115,6 +116,21 @@ const categories      = computed(() => page.props.categories ?? []);
           <template v-else>
             <DesktopNavLinks class="hidden sm:flex"/>
           </template>
+
+          <!-- Compare -->
+          <Link :href="route('compare.index')"
+            class="relative flex flex-col items-center text-gray-600 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 transition px-1">
+            <div class="relative">
+              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"/>
+              </svg>
+              <span v-if="compareCount > 0"
+                class="absolute -top-1.5 -right-1.5 min-w-[18px] h-[18px] px-1 flex items-center justify-center text-[10px] font-bold text-white bg-blue-500 rounded-full ring-2 ring-white dark:ring-gray-900">
+                {{ compareCount > 99 ? '99+' : compareCount }}
+              </span>
+            </div>
+            <span class="text-[10px] font-medium mt-0.5">Compare</span>
+          </Link>
 
           <!-- Cart -->
           <Link :href="route('cart.index')"
