@@ -171,7 +171,7 @@ const isActive = (link) => {
         </aside>
 
         <!-- ── Main Content ─────────────────────────────────────────── -->
-        <main class="flex-1 flex flex-col overflow-hidden min-w-0">
+        <main class="flex-1 flex flex-col overflow-hidden min-w-0 min-h-0">
             <!-- Top Header -->
             <header class="h-16 flex items-center justify-between border-b border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 px-4 sm:px-6">
                 <div class="flex items-center gap-3">
@@ -195,7 +195,7 @@ const isActive = (link) => {
             </header>
 
             <!-- Page Content -->
-            <div class="flex-1 overflow-x-hidden overflow-y-auto bg-gray-50 dark:bg-gray-900 p-4 sm:p-6 lg:p-8">
+            <div class="flex-1 min-h-0 overflow-x-hidden overflow-y-auto bg-gray-50 dark:bg-gray-900 p-4 sm:p-6 lg:p-8">
                 <slot/>
             </div>
         </main>
