@@ -2,6 +2,7 @@
 import { Head, Link, useForm, router, usePage } from '@inertiajs/vue3';
 import Layout from '@/Layouts/Layout.vue';
 import Pagination from '@/Components/Pagination.vue';
+import StorefrontBreadcrumb from '@/Components/StorefrontBreadcrumb.vue';
 import { ref, watch, reactive, computed } from 'vue';
 import debounce from 'lodash/debounce';
 import { useToast } from 'vue-toastification';
@@ -89,12 +90,27 @@ const toggleWishlist = (product) => {
 };
 
 const showMobileFilters = ref(false);
+
+const breadcrumbs = computed(() => {
+    const crumbs = [];
+    if (category.value && props.categories) {
+        const cat = props.categories.find(c => c.slug === category.value);
+        if (cat) {
+            crumbs.push({ label: 'All Products', url: route('shop.index') });
+            crumbs.push({ label: cat.name });
+            return crumbs;
+        }
+    }
+    crumbs.push({ label: 'All Products' });
+    return crumbs;
+});
 </script>
 
 <template>
     <Head title="Shop" />
     <Layout>
         <div class="container mx-auto px-4 pt-4 pb-8">
+            <StorefrontBreadcrumb :items="breadcrumbs" />
             <div class="flex flex-col lg:flex-row gap-8">
                 
                 <!-- ─── Mobile Filter Overlay ────────────────────── -->

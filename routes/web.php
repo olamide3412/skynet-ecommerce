@@ -70,6 +70,9 @@ Route::post('/login', [CustomerAuthController::class , 'login'])->name('customer
 Route::get('/register', [CustomerAuthController::class , 'showRegister'])->name('register');
 Route::post('/register', [CustomerAuthController::class , 'register'])->name('customer.register.submit');
 
+Route::get('/auth/{provider}/redirect', [\App\Http\Controllers\Frontend\SocialLoginController::class, 'redirect'])->name('social.redirect');
+Route::get('/auth/{provider}/callback', [\App\Http\Controllers\Frontend\SocialLoginController::class, 'callback'])->name('social.callback');
+
 // Logout — requires authenticated customer
 Route::middleware('auth:customer')->group(function () {
     Route::post('/logout', [CustomerAuthController::class , 'destroy'])->name('customer.logout');
@@ -94,6 +97,7 @@ Route::prefix('admin')->name('admin.')->group(function () {
             Route::get('products/search-related', [AdminProductController::class , 'searchRelated'])->name('products.search-related');
             Route::get('products/related-by-ids', [AdminProductController::class , 'relatedByIds'])->name('products.related-by-ids');
             Route::resource('attributes', \App\Http\Controllers\Admin\AttributeController::class)->except(['create', 'edit', 'show']);
+            Route::resource('users', \App\Http\Controllers\Admin\UserController::class)->except(['create', 'edit', 'show']);
 
             Route::get('orders', [OrderController::class , 'index'])->name('orders.index');
             Route::get('orders/{order}', [OrderController::class , 'show'])->name('orders.show');

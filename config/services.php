@@ -50,4 +50,16 @@ return [
         'base_url' => env('PAYSTACK_BASE_URL', 'https://api.paystack.co'),
     ],
 
+    'google' => [
+        'client_id' => null,
+        'client_secret' => null,
+        'redirect' => '/auth/google/callback',
+    ],
+
+    'facebook' => [
+        'client_id' => null,
+        'client_secret' => null,
+        'redirect' => '/auth/facebook/callback',
+    ],
+
 ];

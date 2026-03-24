@@ -37,6 +37,14 @@ class SettingsController extends Controller
             // Product display
             'show_stock_level_default'      => 'boolean',
 
+            // Authentication Providers
+            'google_auth_enabled'           => 'boolean',
+            'google_client_id'              => 'nullable|string',
+            'google_client_secret'          => 'nullable|string',
+            'facebook_auth_enabled'         => 'boolean',
+            'facebook_client_id'            => 'nullable|string',
+            'facebook_client_secret'        => 'nullable|string',
+
             // Payment gateways
             'paystack_enabled'              => 'boolean',
             'flutterwave_enabled'           => 'boolean',

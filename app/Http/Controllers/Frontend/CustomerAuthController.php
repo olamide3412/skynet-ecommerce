@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\ValidationException;
 use Inertia\Inertia;
+use App\Rules\Turnstile;
 
 class CustomerAuthController extends Controller
 {
@@ -35,6 +36,7 @@ class CustomerAuthController extends Controller
             'email' => 'required|string|email|max:255|unique:customers',
             'password' => 'required|string|confirmed|min:8',
             'phone' => 'nullable|string|max:20',
+            'cf_turnstile_response' => ['required', new Turnstile()],
         ]);
 
         $customer = Customer::create([
@@ -54,7 +56,10 @@ class CustomerAuthController extends Controller
         $credentials = $request->validate([
             'email' => ['required', 'email'],
             'password' => ['required'],
+            'cf_turnstile_response' => ['required', new Turnstile()],
         ]);
+        
+        unset($credentials['cf_turnstile_response']);
 
         if (Auth::guard('customer')->attempt($credentials, $request->remember ?? false)) {
             $request->session()->regenerate();

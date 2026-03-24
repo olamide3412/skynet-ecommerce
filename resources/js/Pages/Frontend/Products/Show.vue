@@ -1,6 +1,7 @@
 <script setup>
 import { Head, Link, useForm, usePage, router } from '@inertiajs/vue3';
 import Layout from '@/Layouts/Layout.vue';
+import StorefrontBreadcrumb from '@/Components/StorefrontBreadcrumb.vue';
 import { ref, computed, watch } from 'vue';
 import { useToast } from 'vue-toastification';
 
@@ -91,12 +92,24 @@ const toggleWishlist = () => {
         onFinish: () => { togglingWishlist.value = false; },
     });
 };
+
+const breadcrumbs = computed(() => {
+    const crumbs = [
+        { label: 'All Products', url: route('shop.index') }
+    ];
+    if (props.product.category) {
+        crumbs.push({ label: props.product.category.name, url: route('shop.index', { category: props.product.category.slug }) });
+    }
+    crumbs.push({ label: props.product.name });
+    return crumbs;
+});
 </script>
 
 <template>
     <Head :title="product.name" />
     <Layout>
         <div class="container mx-auto px-4 pt-4 pb-8 text-black dark:text-white">
+            <StorefrontBreadcrumb :items="breadcrumbs" />
             <div class="flex flex-col md:flex-row gap-8 bg-white dark:bg-gray-800 p-6 rounded-lg shadow-sm border dark:border-gray-700">
                 <div class="w-full md:w-1/2">
                     <div class="mb-4">

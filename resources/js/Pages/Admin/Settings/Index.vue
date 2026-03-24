@@ -40,6 +40,13 @@ const form = useForm({
     wishlist_enabled:               props.settings.wishlist_enabled === '1',
     tracking_number_prefix:         props.settings.tracking_number_prefix || 'SKY-',
     show_stock_level_default:       props.settings.show_stock_level_default !== '0',
+    // Authentication Providers
+    google_auth_enabled:            props.settings.google_auth_enabled === '1',
+    google_client_id:               props.settings.google_client_id || '',
+    google_client_secret:           props.settings.google_client_secret || '',
+    facebook_auth_enabled:          props.settings.facebook_auth_enabled === '1',
+    facebook_client_id:             props.settings.facebook_client_id || '',
+    facebook_client_secret:         props.settings.facebook_client_secret || '',
 });
 
 const handleLogoUpload = (e) => {
@@ -71,7 +78,7 @@ const storeFeatures = computed(() => ({
 }));
 
 // Reusable toggle row component logic
-const toggleSwitch = `w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600`;
+const toggleSwitch = `relative w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600`;
 </script>
 
 <template>
@@ -138,6 +145,69 @@ const toggleSwitch = `w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ri
                                     <p class="text-xs text-gray-500 mb-3">PNG, JPG up to 2MB</p>
                                 </template>
                                 <input type="file" @change="handleLogoUpload" accept="image/*" class="text-sm text-gray-500 file:mr-3 file:py-1 file:px-3 file:rounded-md file:border-0 file:text-xs file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 cursor-pointer w-full max-w-[200px]" />
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- ─── Authentication Providers ───────────────────────────────────── -->
+                <section class="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 overflow-hidden">
+                    <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/60">
+                        <h2 class="text-lg font-semibold flex items-center gap-2">🔐 Authentication Providers</h2>
+                        <p class="text-sm text-gray-500 dark:text-gray-400">Configure Google and Facebook OAuth for quick customer sign in.</p>
+                    </div>
+                    <div class="p-6 space-y-8">
+                        <!-- Google Block -->
+                        <div>
+                            <div class="flex items-center justify-between mb-4">
+                                <div>
+                                    <h3 class="text-md font-bold text-gray-900 dark:text-white flex items-center gap-2">
+                                        <svg class="w-5 h-5 text-red-500" viewBox="0 0 24 24" fill="currentColor"><path d="M21.35,11.1H12.18V13.83H18.69C18.36,17.64 15.19,19.27 12.19,19.27C8.36,19.27 5,16.25 5,12C5,7.9 8.2,4.73 12.2,4.73C15.29,4.73 17.1,6.7 17.1,6.7L19,4.72C19,4.72 16.56,2 12.1,2C6.42,2 2.03,6.8 2.03,12C2.03,17.05 6.16,22 12.25,22C17.6,22 21.5,18.33 21.5,12.91C21.5,11.76 21.35,11.1 21.35,11.1V11.1Z" /></svg>
+                                        Google Login
+                                    </h3>
+                                    <p class="text-xs text-gray-500 mt-1">Callback URI: <code>{{ $page.props.app_url || 'https://yourdomain.com' }}/auth/google/callback</code></p>
+                                </div>
+                                <label class="inline-flex items-center cursor-pointer">
+                                    <input type="checkbox" v-model="form.google_auth_enabled" class="sr-only peer">
+                                    <div :class="toggleSwitch"></div>
+                                </label>
+                            </div>
+                            <div v-if="form.google_auth_enabled" class="grid grid-cols-1 md:grid-cols-2 gap-4 bg-gray-50 border dark:border-gray-700 dark:bg-gray-900/40 p-4 rounded-lg">
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Google Client ID</label>
+                                    <input type="text" v-model="form.google_client_id" class="w-full rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700 px-3 py-2 text-sm" placeholder="123456789-xxxx...apps.googleusercontent.com" />
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Google Client Secret</label>
+                                    <input type="password" v-model="form.google_client_secret" class="w-full rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700 px-3 py-2 text-sm" placeholder="GOCSPX-xxxx..." />
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Facebook Block -->
+                        <div class="border-t border-gray-100 dark:border-gray-700 pt-6 mt-6">
+                            <div class="flex items-center justify-between mb-4">
+                                <div>
+                                    <h3 class="text-md font-bold text-gray-900 dark:text-white flex items-center gap-2">
+                                        <svg class="w-5 h-5 text-blue-600" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2.04C6.5 2.04 2 6.53 2 12.06C2 17.06 5.66 21.21 10.44 21.96V14.96H7.9V12.06H10.44V9.85C10.44 7.34 11.93 5.96 14.22 5.96C15.31 5.96 16.45 6.15 16.45 6.15V8.62H15.19C13.95 8.62 13.56 9.39 13.56 10.18V12.06H16.34L15.89 14.96H13.56V21.96A10 10 0 0 0 22 12.06C22 6.53 17.5 2.04 12 2.04Z"/></svg>
+                                        Facebook Login
+                                    </h3>
+                                    <p class="text-xs text-gray-500 mt-1">Callback URI: <code>{{ $page.props.app_url || 'https://yourdomain.com' }}/auth/facebook/callback</code></p>
+                                </div>
+                                <label class="inline-flex items-center cursor-pointer">
+                                    <input type="checkbox" v-model="form.facebook_auth_enabled" class="sr-only peer">
+                                    <div :class="toggleSwitch"></div>
+                                </label>
+                            </div>
+                            <div v-if="form.facebook_auth_enabled" class="grid grid-cols-1 md:grid-cols-2 gap-4 bg-gray-50 border dark:border-gray-700 dark:bg-gray-900/40 p-4 rounded-lg">
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Facebook App ID</label>
+                                    <input type="text" v-model="form.facebook_client_id" class="w-full rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700 px-3 py-2 text-sm" placeholder="123456789012345" />
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Facebook App Secret</label>
+                                    <input type="password" v-model="form.facebook_client_secret" class="w-full rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700 px-3 py-2 text-sm" placeholder="xxxxxxxxxxxx" />
+                                </div>
                             </div>
                         </div>
                     </div>
