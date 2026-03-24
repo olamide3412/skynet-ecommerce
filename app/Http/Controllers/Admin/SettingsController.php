@@ -25,7 +25,23 @@ class SettingsController extends Controller
             'company_phone'                 => 'nullable|string|max:50',
             'company_address'               => 'nullable|string|max:500',
             'company_tagline'               => 'nullable|string|max:500',
-            
+
+            // Homepage Hero Content
+            'hero_badge'                    => 'nullable|string|max:100',
+            'hero_title'                    => 'nullable|string|max:255',
+            'hero_title_highlight'          => 'nullable|string|max:100',
+            'hero_subtitle'                 => 'nullable|string|max:500',
+            'hero_cta_primary'              => 'nullable|string|max:50',
+            'hero_cta_secondary'            => 'nullable|string|max:50',
+
+            // Homepage Feature Blocks
+            'feature_1_title'               => 'nullable|string|max:100',
+            'feature_1_desc'                => 'nullable|string|max:255',
+            'feature_2_title'               => 'nullable|string|max:100',
+            'feature_2_desc'                => 'nullable|string|max:255',
+            'feature_3_title'               => 'nullable|string|max:100',
+            'feature_3_desc'                => 'nullable|string|max:255',
+
             // Store Features
             'order_tracking_enabled'        => 'boolean',
             'customer_registration_enabled' => 'boolean',
@@ -68,6 +84,12 @@ class SettingsController extends Controller
             $request->validate(['company_logo' => 'image|max:2048']);
             $logoPath = $request->file('company_logo')->store('settings', 'public');
             StoreSetting::set('company_logo', $logoPath);
+        }
+
+        if ($request->hasFile('hero_image')) {
+            $request->validate(['hero_image' => 'image|max:4096']);
+            $heroPath = $request->file('hero_image')->store('settings', 'public');
+            StoreSetting::set('hero_image', $heroPath);
         }
 
         foreach ($data as $key => $value) {

@@ -61,6 +61,29 @@ class DatabaseSeeder extends Seeder
 
         // Default Store Settings
         $defaults = [
+            // Branding
+            'company_name' => 'Skynet Digital Store',
+            'company_tagline' => 'Your One-Stop Shop for Premium Tech & Gear',
+            'company_email' => 'support@skynetdigitalhub.com.ng',
+            'company_phone' => '+2348032072831',
+            'company_address' => 'Delta State, Nigeria',
+
+            // Homepage Hero
+            'hero_badge' => 'New Collection 2026',
+            'hero_title' => 'Discover Digital',
+            'hero_title_highlight' => 'Excellence',
+            'hero_subtitle' => 'Shop premium products, authentic brands, and quality gear built for your lifestyle.',
+            'hero_cta_primary' => 'Shop Now',
+            'hero_cta_secondary' => 'Explore Categories',
+
+            // Homepage Feature Blocks
+            'feature_1_title' => 'Secure Payments',
+            'feature_1_desc' => '100% secure checkout via Paystack & Flutterwave.',
+            'feature_2_title' => 'Fast Checkout',
+            'feature_2_desc' => 'Seamless integration and instantaneous validation.',
+            'feature_3_title' => 'Premium Support',
+            'feature_3_desc' => 'Priority technical response round the clock 24/7.',
+
             // Payments
             'paystack_enabled' => '1',
             'flutterwave_enabled' => '1',

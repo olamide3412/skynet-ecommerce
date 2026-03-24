@@ -25,16 +25,16 @@ const pinia = createPinia();
 
 createInertiaApp({
     title: (title) => `${title}`,
-    resolve: name => {
-        const pages = import.meta.glob('./Pages/**/*.vue', { eager: true })
-        let page = pages[`./Pages/${name}.vue`];
-        
-        // Only apply the default storefront layout if it's a public page
-        if (!name.startsWith('Admin/') && !name.startsWith('Auth/')) {
-            page.default.layout = page.default.layout || Layout;
-        }
-        
-        return page;
+    resolve: (name) => {
+        const pages = import.meta.glob('./Pages/**/*.vue');
+        const page = pages[`./Pages/${name}.vue`]();
+
+        return page.then((module) => {
+            if (!name.startsWith('Admin/') && !name.startsWith('Auth/')) {
+                module.default.layout = module.default.layout || Layout;
+            }
+            return module;
+        });
     },
     setup({ el, App, props, plugin }) {
         const app = createApp({ render: () => h(App, props) });

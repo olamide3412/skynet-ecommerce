@@ -14,7 +14,7 @@ import { Link } from '@inertiajs/vue3'
         <!-- Left Column: Logo + Company Description -->
         <div class="md:w-1/3" data-aos="fade-up" data-aos-delay="100">
           <img :src="$page.props.store_settings.company_logo ? '/storage/' + $page.props.store_settings.company_logo : Logo" :alt="$page.props.store_settings.company_name || 'Texas Trust Retail & Credit Marketplace Logo'" class="h-16 mb-4 object-contain" />
-          <p class="text-sm leading-relaxed">
+          <p class="hidden text-sm leading-relaxed">
             We design, build, secure, and maintain modern digital systems that help organizations grow, operate faster, and stay competitive.
           </p>
         </div>
@@ -25,8 +25,6 @@ import { Link } from '@inertiajs/vue3'
           <ul class="space-y-2 text-sm">
             <li><Link :href="route('home')" class="hover:underline">Home</Link></li>
             <li><a href="#" class="hover:underline">About Us</a></li>
-            <li><a href="#" class="hover:underline">Services</a></li>
-            <li><a href="#" class="hover:underline">Portfolio</a></li>
             <li><a href="#" class="hover:underline">Contact</a></li>
           </ul>
         </nav>

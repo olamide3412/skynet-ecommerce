@@ -31,26 +31,36 @@ const addToCart = (product) => {
         <section class="relative bg-gray-50 dark:bg-gray-900 border-b dark:border-gray-800">
             <div class="container mx-auto px-4 py-20 lg:py-32 flex flex-col lg:flex-row items-center gap-12">
                 <div class="lg:w-1/2" data-aos="fade-right">
-                    <span class="text-blue-600 dark:text-blue-400 font-bold tracking-wider uppercase text-sm mb-4 block">Summer Collection 2026</span>
+                    <span class="text-blue-600 dark:text-blue-400 font-bold tracking-wider uppercase text-sm mb-4 block">
+                        {{ $page.props.store_settings.hero_badge || 'New Collection 2026' }}
+                    </span>
                     <h1 class="text-5xl md:text-6xl font-extrabold text-gray-900 dark:text-white leading-tight mb-6">
-                        Discover Digital <br>
-                        <span class="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-indigo-600">Excellence</span>
+                        {{ $page.props.store_settings.hero_title || 'Discover Digital' }} <br>
+                        <span class="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-indigo-600">
+                            {{ $page.props.store_settings.hero_title_highlight || 'Excellence' }}
+                        </span>
                     </h1>
                     <p class="text-xl text-gray-600 dark:text-gray-300 mb-8 max-w-lg">
-                        Shop premium products, authentic brands, and quality gear built for your lifestyle.
+                        {{ $page.props.store_settings.hero_subtitle || 'Shop premium products, authentic brands, and quality gear built for your lifestyle.' }}
                     </p>
                     <div class="flex gap-4">
                         <Link :href="route('shop.index')" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-8 rounded-lg shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
-                            Shop Now
+                            {{ $page.props.store_settings.hero_cta_primary || 'Shop Now' }}
                         </Link>
                         <Link :href="route('shop.index')" class="bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 text-gray-900 dark:text-white border border-gray-200 dark:border-gray-700 font-semibold py-3 px-8 rounded-lg transition-all duration-300 shadow-sm">
-                            Explore Categories
+                            {{ $page.props.store_settings.hero_cta_secondary || 'Explore Categories' }}
                         </Link>
                     </div>
                 </div>
                 <div class="lg:w-1/2 relative" data-aos="fade-left">
                     <div class="absolute inset-0 bg-blue-400 opacity-20 blur-[100px] rounded-full"></div>
-                    <img src="https://images.unsplash.com/photo-1483985988355-763728e1935b?auto=format&fit=crop&q=80&w=800&h=600" alt="Hero Image" class="relative z-10 w-full rounded-2xl shadow-2xl object-cover h-[500px]" />
+                    <img
+                        :src="$page.props.store_settings.hero_image
+                            ? '/storage/' + $page.props.store_settings.hero_image
+                            : 'https://images.unsplash.com/photo-1483985988355-763728e1935b?auto=format&fit=crop&q=80&w=800&h=600'"
+                        alt="Hero Image"
+                        class="relative z-10 w-full rounded-2xl shadow-2xl object-cover h-[500px]"
+                    />
                 </div>
             </div>
         </section>
@@ -98,18 +108,18 @@ const addToCart = (product) => {
                         <div class="p-6 flex flex-col flex-grow">
                             <span class="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-2">{{ product.category?.name }}</span>
                             <Link :href="route('shop.show', product.url_key)" class="text-lg font-bold text-gray-900 dark:text-white hover:text-blue-600 dark:hover:text-blue-400 transition mb-2 line-clamp-2">{{ product.name }}</Link>
-                                                        <div class="mt-auto pt-4 flex items-center justify-between border-t border-gray-100 dark:border-gray-700">
-                                    <div class="flex flex-col">
-                                        <span v-if="product.discount_price" class="text-xs text-gray-400 line-through">₦{{ parseFloat(product.price).toLocaleString() }}</span>
-                                        <span class="text-xl font-extrabold text-blue-600 dark:text-blue-400">
-                                            ₦{{ product.discount_price ? parseFloat(product.discount_price).toLocaleString() : parseFloat(product.price).toLocaleString() }}
-                                        </span>
-                                    </div>
-                                    <button @click="addToCart(product)" :disabled="addingToCart[product.id]" class="w-10 h-10 rounded-full bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-blue-600 hover:text-white transition flex items-center justify-center disabled:opacity-60">
-                                        <svg v-if="!addingToCart[product.id]" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
-                                        <svg v-else class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/></svg>
-                                    </button>
+                            <div class="mt-auto pt-4 flex items-center justify-between border-t border-gray-100 dark:border-gray-700">
+                                <div class="flex flex-col">
+                                    <span v-if="product.discount_price" class="text-xs text-gray-400 line-through">₦{{ parseFloat(product.price).toLocaleString() }}</span>
+                                    <span class="text-xl font-extrabold text-blue-600 dark:text-blue-400">
+                                        ₦{{ product.discount_price ? parseFloat(product.discount_price).toLocaleString() : parseFloat(product.price).toLocaleString() }}
+                                    </span>
                                 </div>
+                                <button @click="addToCart(product)" :disabled="addingToCart[product.id]" class="w-10 h-10 rounded-full bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-blue-600 hover:text-white transition flex items-center justify-center disabled:opacity-60">
+                                    <svg v-if="!addingToCart[product.id]" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
+                                    <svg v-else class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/></svg>
+                                </button>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -129,7 +139,6 @@ const addToCart = (product) => {
                 </Link>
             </div>
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
-                <!-- Reusing Product Card Template for new arrivals -->
                 <div v-for="product in new_arrivals" :key="product.id" class="bg-gray-50 dark:bg-gray-800/50 rounded-xl overflow-hidden hover:shadow-lg transition-all duration-300 border border-gray-100 dark:border-gray-700 group flex flex-col">
                     <div class="relative overflow-hidden h-56 shrink-0">
                         <img :src="product.image ? '/storage/' + product.image : 'https://placehold.co/400x400'" class="w-full h-full object-cover transform group-hover:scale-105 transition duration-700" :alt="product.name" />
@@ -154,27 +163,27 @@ const addToCart = (product) => {
         <section class="border-t dark:border-gray-800 bg-white dark:bg-dark py-12">
             <div class="container mx-auto px-4">
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-8 divide-y md:divide-y-0 md:divide-x dark:divide-gray-800">
-                     <div class="p-6 text-center flex flex-col items-center">
+                    <div class="p-6 text-center flex flex-col items-center">
                         <div class="w-16 h-16 bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 rounded-full flex items-center justify-center mb-4">
                             <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
                         </div>
-                        <h3 class="text-lg font-bold mb-2">Secure Payments</h3>
-                        <p class="text-sm text-gray-500 dark:text-gray-400">100% secure checkout via Paystack & Flutterwave.</p>
-                     </div>
-                     <div class="p-6 text-center flex flex-col items-center">
+                        <h3 class="text-lg font-bold mb-2">{{ $page.props.store_settings.feature_1_title || 'Secure Payments' }}</h3>
+                        <p class="text-sm text-gray-500 dark:text-gray-400">{{ $page.props.store_settings.feature_1_desc || '100% secure checkout via Paystack & Flutterwave.' }}</p>
+                    </div>
+                    <div class="p-6 text-center flex flex-col items-center">
                         <div class="w-16 h-16 bg-emerald-50 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400 rounded-full flex items-center justify-center mb-4">
                             <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
                         </div>
-                        <h3 class="text-lg font-bold mb-2">Fast Checkout</h3>
-                        <p class="text-sm text-gray-500 dark:text-gray-400">Seamless integration and instantaneous validation.</p>
-                     </div>
-                     <div class="p-6 text-center flex flex-col items-center">
+                        <h3 class="text-lg font-bold mb-2">{{ $page.props.store_settings.feature_2_title || 'Fast Checkout' }}</h3>
+                        <p class="text-sm text-gray-500 dark:text-gray-400">{{ $page.props.store_settings.feature_2_desc || 'Seamless integration and instantaneous validation.' }}</p>
+                    </div>
+                    <div class="p-6 text-center flex flex-col items-center">
                         <div class="w-16 h-16 bg-purple-50 dark:bg-purple-900/30 text-purple-600 dark:text-purple-400 rounded-full flex items-center justify-center mb-4">
                             <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 5.636l-3.536 3.536m0 5.656l3.536 3.536M9.172 9.172L5.636 5.636m3.536 9.192l-3.536 3.536M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-5 0a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
                         </div>
-                        <h3 class="text-lg font-bold mb-2">Premium Support</h3>
-                        <p class="text-sm text-gray-500 dark:text-gray-400">Priority technical response round the clock 24/7.</p>
-                     </div>
+                        <h3 class="text-lg font-bold mb-2">{{ $page.props.store_settings.feature_3_title || 'Premium Support' }}</h3>
+                        <p class="text-sm text-gray-500 dark:text-gray-400">{{ $page.props.store_settings.feature_3_desc || 'Priority technical response round the clock 24/7.' }}</p>
+                    </div>
                 </div>
             </div>
         </section>

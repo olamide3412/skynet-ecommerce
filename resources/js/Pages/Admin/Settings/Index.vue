@@ -16,6 +16,21 @@ const form = useForm({
     company_phone:          props.settings.company_phone || '+2348032072831',
     company_address:        props.settings.company_address || 'Delta State, Nigeria',
     company_logo:           null,
+    // Homepage Hero
+    hero_badge:             props.settings.hero_badge || 'New Collection 2026',
+    hero_title:             props.settings.hero_title || 'Discover Digital',
+    hero_title_highlight:   props.settings.hero_title_highlight || 'Excellence',
+    hero_subtitle:          props.settings.hero_subtitle || 'Shop premium products, authentic brands, and quality gear built for your lifestyle.',
+    hero_cta_primary:       props.settings.hero_cta_primary || 'Shop Now',
+    hero_cta_secondary:     props.settings.hero_cta_secondary || 'Explore Categories',
+    hero_image:             null,
+    // Homepage Feature Blocks
+    feature_1_title:        props.settings.feature_1_title || 'Secure Payments',
+    feature_1_desc:         props.settings.feature_1_desc || '100% secure checkout via Paystack & Flutterwave.',
+    feature_2_title:        props.settings.feature_2_title || 'Fast Checkout',
+    feature_2_desc:         props.settings.feature_2_desc || 'Seamless integration and instantaneous validation.',
+    feature_3_title:        props.settings.feature_3_title || 'Premium Support',
+    feature_3_desc:         props.settings.feature_3_desc || 'Priority technical response round the clock 24/7.',
     // Payments
     paystack_enabled:       props.settings.paystack_enabled === '1',
     flutterwave_enabled:    props.settings.flutterwave_enabled === '1',
@@ -51,6 +66,10 @@ const form = useForm({
 
 const handleLogoUpload = (e) => {
     form.company_logo = e.target.files[0];
+};
+
+const handleHeroImageUpload = (e) => {
+    form.hero_image = e.target.files[0];
 };
 
 const save = () => {
@@ -147,6 +166,85 @@ const toggleSwitch = `relative w-11 h-6 bg-gray-200 peer-focus:outline-none peer
                                 <input type="file" @change="handleLogoUpload" accept="image/*" class="text-sm text-gray-500 file:mr-3 file:py-1 file:px-3 file:rounded-md file:border-0 file:text-xs file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 cursor-pointer w-full max-w-[200px]" />
                             </div>
                         </div>
+                    </div>
+                </section>
+
+                <!-- ─── Homepage Content ──────────────────────────────────── -->
+                <section class="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 overflow-hidden">
+                    <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/60">
+                        <h2 class="text-lg font-semibold">🏠 Homepage Content</h2>
+                        <p class="text-sm text-gray-500 dark:text-gray-400">Edit the text and image displayed on the storefront homepage hero and feature blocks.</p>
+                    </div>
+                    <div class="p-6 space-y-6">
+
+                        <!-- Hero Badge + Title -->
+                        <div>
+                            <h3 class="text-sm font-bold uppercase tracking-wider text-blue-600 dark:text-blue-400 mb-4">Hero Section</h3>
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Badge Text <span class="text-xs text-gray-400">(e.g. Summer Collection 2026)</span></label>
+                                    <input type="text" v-model="form.hero_badge" class="w-full rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700 px-3 py-2 text-sm" placeholder="Summer Collection 2026" />
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Highlighted Word <span class="text-xs text-gray-400">(rendered in gradient)</span></label>
+                                    <input type="text" v-model="form.hero_title_highlight" class="w-full rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700 px-3 py-2 text-sm" placeholder="Excellence" />
+                                </div>
+                                <div class="sm:col-span-2">
+                                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Hero Heading <span class="text-xs text-gray-400">(line before the highlighted word)</span></label>
+                                    <input type="text" v-model="form.hero_title" class="w-full rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700 px-3 py-2 text-sm" placeholder="Discover Digital" />
+                                </div>
+                                <div class="sm:col-span-2">
+                                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Hero Subtitle / Description</label>
+                                    <textarea v-model="form.hero_subtitle" rows="2" class="w-full rounded-lg border border-gray-300 dark:border-gray-600 dark:bg-gray-700 px-3 py-2 text-sm" placeholder="Shop premium products..."></textarea>
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Primary CTA Button Text</label>
+                                    <input type="text" v-model="form.hero_cta_primary" class="w-full rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700 px-3 py-2 text-sm" placeholder="Shop Now" />
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Secondary CTA Button Text</label>
+                                    <input type="text" v-model="form.hero_cta_secondary" class="w-full rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700 px-3 py-2 text-sm" placeholder="Explore Categories" />
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Hero Image Upload -->
+                        <div class="border-t dark:border-gray-700 pt-5">
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Hero Image</label>
+                            <div class="flex items-start gap-6">
+                                <div class="w-48 h-32 rounded-xl overflow-hidden border dark:border-gray-600 bg-gray-100 dark:bg-gray-900 flex-shrink-0">
+                                    <img v-if="props.settings.hero_image" :src="'/storage/' + props.settings.hero_image" class="w-full h-full object-cover" alt="Current hero image" />
+                                    <div v-else class="w-full h-full flex items-center justify-center text-gray-400 text-xs">No image set</div>
+                                </div>
+                                <div class="flex-1">
+                                    <div class="border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg p-4 text-center bg-gray-50 dark:bg-gray-900/50 hover:bg-gray-100 dark:hover:bg-gray-800 transition">
+                                        <svg class="w-8 h-8 text-gray-400 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/></svg>
+                                        <p class="text-xs text-gray-500 mb-2">Upload a new hero image (PNG, JPG, max 4MB)</p>
+                                        <input type="file" @change="handleHeroImageUpload" accept="image/*" class="text-sm text-gray-500 file:mr-2 file:py-1 file:px-3 file:rounded-md file:border-0 file:text-xs file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 cursor-pointer" />
+                                    </div>
+                                    <p v-if="form.hero_image" class="text-xs text-green-600 mt-2 font-semibold">✓ New image selected — will be applied on save.</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Feature Blocks -->
+                        <div class="border-t dark:border-gray-700 pt-5">
+                            <h3 class="text-sm font-bold uppercase tracking-wider text-blue-600 dark:text-blue-400 mb-4">Feature Blocks (bottom of homepage)</h3>
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                                <div v-for="n in 3" :key="n" class="bg-gray-50 dark:bg-gray-900/40 rounded-xl p-4 border dark:border-gray-700 space-y-3">
+                                    <p class="text-xs font-bold text-gray-500 uppercase tracking-wider">Feature {{ n }}</p>
+                                    <div>
+                                        <label class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">Title</label>
+                                        <input type="text" v-model="form[`feature_${n}_title`]" class="w-full rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700 px-3 py-2 text-sm" />
+                                    </div>
+                                    <div>
+                                        <label class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">Description</label>
+                                        <textarea v-model="form[`feature_${n}_desc`]" rows="2" class="w-full rounded-lg border border-gray-300 dark:border-gray-600 dark:bg-gray-700 px-3 py-2 text-sm"></textarea>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
                     </div>
                 </section>
 
