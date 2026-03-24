@@ -17,6 +17,7 @@ const form = useForm({
     company_address:        props.settings.company_address || 'Delta State, Nigeria',
     company_logo:           null,
     // Homepage Hero
+    hero_enabled:           props.settings.hero_enabled !== '0',
     hero_badge:             props.settings.hero_badge || 'New Collection 2026',
     hero_title:             props.settings.hero_title || 'Discover Digital',
     hero_title_highlight:   props.settings.hero_title_highlight || 'Excellence',
@@ -179,8 +180,15 @@ const toggleSwitch = `relative w-11 h-6 bg-gray-200 peer-focus:outline-none peer
 
                         <!-- Hero Badge + Title -->
                         <div>
-                            <h3 class="text-sm font-bold uppercase tracking-wider text-blue-600 dark:text-blue-400 mb-4">Hero Section</h3>
-                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <div class="flex items-center justify-between mb-4">
+                                <h3 class="text-sm font-bold uppercase tracking-wider text-blue-600 dark:text-blue-400">Hero Section</h3>
+                                <label class="inline-flex items-center cursor-pointer">
+                                    <input type="checkbox" v-model="form.hero_enabled" class="sr-only peer">
+                                    <div :class="toggleSwitch"></div>
+                                    <span class="ml-3 text-sm font-medium text-gray-900 dark:text-gray-300">{{ form.hero_enabled ? 'Enabled' : 'Disabled' }}</span>
+                                </label>
+                            </div>
+                            <div v-if="form.hero_enabled" class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                 <div>
                                     <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Badge Text <span class="text-xs text-gray-400">(e.g. Summer Collection 2026)</span></label>
                                     <input type="text" v-model="form.hero_badge" class="w-full rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700 px-3 py-2 text-sm" placeholder="Summer Collection 2026" />
@@ -189,19 +197,19 @@ const toggleSwitch = `relative w-11 h-6 bg-gray-200 peer-focus:outline-none peer
                                     <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Highlighted Word <span class="text-xs text-gray-400">(rendered in gradient)</span></label>
                                     <input type="text" v-model="form.hero_title_highlight" class="w-full rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700 px-3 py-2 text-sm" placeholder="Excellence" />
                                 </div>
-                                <div class="sm:col-span-2">
+                                <div v-if="form.hero_enabled" class="sm:col-span-2">
                                     <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Hero Heading <span class="text-xs text-gray-400">(line before the highlighted word)</span></label>
                                     <input type="text" v-model="form.hero_title" class="w-full rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700 px-3 py-2 text-sm" placeholder="Discover Digital" />
                                 </div>
-                                <div class="sm:col-span-2">
+                                <div v-if="form.hero_enabled" class="sm:col-span-2">
                                     <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Hero Subtitle / Description</label>
                                     <textarea v-model="form.hero_subtitle" rows="2" class="w-full rounded-lg border border-gray-300 dark:border-gray-600 dark:bg-gray-700 px-3 py-2 text-sm" placeholder="Shop premium products..."></textarea>
                                 </div>
-                                <div>
+                                <div v-if="form.hero_enabled">
                                     <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Primary CTA Button Text</label>
                                     <input type="text" v-model="form.hero_cta_primary" class="w-full rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700 px-3 py-2 text-sm" placeholder="Shop Now" />
                                 </div>
-                                <div>
+                                <div v-if="form.hero_enabled">
                                     <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Secondary CTA Button Text</label>
                                     <input type="text" v-model="form.hero_cta_secondary" class="w-full rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700 px-3 py-2 text-sm" placeholder="Explore Categories" />
                                 </div>
@@ -209,7 +217,7 @@ const toggleSwitch = `relative w-11 h-6 bg-gray-200 peer-focus:outline-none peer
                         </div>
 
                         <!-- Hero Image Upload -->
-                        <div class="border-t dark:border-gray-700 pt-5">
+                        <div v-if="form.hero_enabled" class="border-t dark:border-gray-700 pt-5">
                             <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Hero Image</label>
                             <div class="flex items-start gap-6">
                                 <div class="w-48 h-32 rounded-xl overflow-hidden border dark:border-gray-600 bg-gray-100 dark:bg-gray-900 flex-shrink-0">

@@ -13,7 +13,7 @@ export default defineConfig({
         tailwindcss(),
     ],
     build: {
-        chunkSizeWarningLimit: 600,
+        chunkSizeWarningLimit: 1000,
         rollupOptions: {
             output: {
                 manualChunks(id) {
@@ -23,6 +23,15 @@ export default defineConfig({
                         }
                         if (id.includes('vue') || id.includes('@inertiajs')) {
                             return 'vue-vendor';
+                        }
+                        if (id.includes('html2pdf.js')) {
+                            return 'html2pdf';
+                        }
+                        if (id.includes('quill')) {
+                            return 'quill';
+                        }
+                        if (id.includes('aos')) {
+                            return 'aos';
                         }
                         return 'vendor';
                     }

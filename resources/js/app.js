@@ -7,17 +7,14 @@ import { ZiggyVue } from '../../vendor/tightenco/ziggy';
 import Toast from 'vue-toastification';
 import 'vue-toastification/dist/index.css';
 import { formatDate } from './Utils/dateFormat';
-import AOS from 'aos';
 import 'aos/dist/aos.css';
 import { createPinia } from 'pinia';
 import { useThemeStore } from './Stores/themeStore';
 import FlashMessages from './Components/FlashMessages.vue';
 
 
-AOS.init({
-    duration: 1000,
-    once: true,
-});
+// AOS is now dynamically imported in setup
+// AOS.init moved to setup
 
 
 
@@ -51,6 +48,14 @@ createInertiaApp({
         app.component('Head', Head)
             .component('Link', Link)
             .component('FlashMessages', FlashMessages);
+
+        // ✅ Dynamically import AOS to split the chunk
+        import('aos').then((AOS) => {
+            AOS.default.init({
+                duration: 1000,
+                once: true,
+            });
+        });
 
         // ✅ Dynamically import FontAwesome to split the chunk
         import('./fontawesome').then(({ FontAwesomeIcon }) => {

@@ -69,6 +69,7 @@ class DatabaseSeeder extends Seeder
             'company_address' => 'Delta State, Nigeria',
 
             // Homepage Hero
+            'hero_enabled' => '1',
             'hero_badge' => 'New Collection 2026',
             'hero_title' => 'Discover Digital',
             'hero_title_highlight' => 'Excellence',

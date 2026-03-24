@@ -28,7 +28,7 @@ const addToCart = (product) => {
     <Head :title="'Welcome to ' + ($page.props.store_settings.company_name || 'Skynet Digital Store')" />
     <Layout>
         <!-- Hero Section -->
-        <section class="relative bg-gray-50 dark:bg-gray-900 border-b dark:border-gray-800">
+        <section v-if="$page.props.store_settings.hero_enabled !== '0'" class="relative bg-gray-50 dark:bg-gray-900 border-b dark:border-gray-800">
             <div class="container mx-auto px-4 py-20 lg:py-32 flex flex-col lg:flex-row items-center gap-12">
                 <div class="lg:w-1/2" data-aos="fade-right">
                     <span class="text-blue-600 dark:text-blue-400 font-bold tracking-wider uppercase text-sm mb-4 block">
