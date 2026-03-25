@@ -4,37 +4,56 @@ These instructions outline the core technologies, coding style, and architectura
 
 ## Tech Stack Overview
 - **Backend framework:** Laravel 11.x
-- **Frontend framework:** Vue 3 (Composition API)
-- **Routing & Data Bridge:** Inertia.js (with Ziggy for client-side routing)
-- **Styling:** Tailwind CSS (built with Vite)
-- **State/Notifications:** Pinia, `vue-toastification`
+- **Frontend framework:** Vue 3 (Composition API with `<script setup>`)
+- **Routing & Data Bridge:** Inertia.js (SDR)
+- **Styling:** Vanilla Tailwind CSS (v4+ via `@tailwindcss/vite`)
+- **State Management:** Pinia (using stores in `resources/js/Stores`)
+- **Icons & Animation:** FontAwesome (Vue component), AOS (Animate On Scroll)
+- **Notifications:** `vue-toastification`
 
 ---
 
-## Frontend (Vue 3 + Inertia) Guidelines
-
-1. **Composition API Only:** Always use the `<script setup>` syntax for writing Vue components. Avoid the Options API.
-2. **Inertia Navigation:** Do not use standard `<a>` tags for internal links. Replace them with Inertia's `<Link>` component to ensure SPA-like soft transitions without full page reloads.
-3. **Forms & Submissions:** Use Inertia's `useForm()` helper for reactive form state, validation error handling, and AJAX submissions (e.g., `form.post(route('...'))`).
-4. **Client-side Routing:** Utilize the `route('route.name')` helper provided by Ziggy within Vue templates instead of hardcoding URLs.
-5. **Dark Mode Integration:** We support a fully realized dark mode. Always implement Tailwind's `dark:` variant classes alongside standard classes (e.g., `bg-white dark:bg-gray-900 text-gray-900 dark:text-white`).
-6. **Toast Notifications:** Use `vue-toastification` for displaying inline feedback messages (e.g., `toast.success('Saved!')` or `toast.error('Failed!')`) after user interactions like form submissions.
-7. **Component Architecture:** Maintain a strict separation between page-level views (stored in `resources/js/Pages/`) and reusable elements (stored in `resources/js/Components/`).
+## 🚀 Starting a New Project (Skeleton: Skynet Digital)
+When starting a new project using the **skynet-digital** (or `skynet-ecommerce`) skeleton:
+1. **Clone & Setup:** Use the existing project structure as a template.
+2. **Database:** Initialize the `store_settings` table. Use the `DatabaseSeeder` to populate default company branding, hero sections, and feature blocks.
+3. **Branding:** Immediately update `Admin/Settings/Index.vue` with the new project's name, logo, and colors.
+4. **Environment:** Ensure `APP_URL` is set correctly for Ziggy and social login callbacks.
 
 ---
 
-## Backend (Laravel) Guidelines
-
-1. **Controllers & Routing:** Keep controllers skinny. They should primarily validate input, interact with models/services, and return an Inertia response (`return Inertia::render('Path/To/View', [...])`) or redirect safely (`return back()->with(...)`).
-2. **Validation:** Validate all incoming HTTP request data using either Laravel Form Requests or direct array validation (`$request->validate([...])`) before processing anything.
-3. **Security Standards:** Where dealing with public-facing submissions (Contact form, Login, Registration), ensure Cloudflare Turnstile CAPTCHA validation is required on the backend.
-4. **Configuration Mapping:** Do not use `env('VAR_NAME')` outside of `config/` files. Always use `config('file.var')` within controllers or middleware to access environment variables.
-5. **Database & Models:** Use Eloquent ORM. Keep business logic out of the views and firmly within Controllers, Models, or dedicated Service classes.
+## 🎨 Design System & Aesthetics
+- **Premium Look:** Favor vibrant gradients, subtle glassmorphism (`backdrop-blur`), and modern typography (Outfit/Inter).
+- **Dark Mode:** Support `dark:` variants for every UI element. Standard background is `bg-white dark:bg-gray-900`.
+- **Micro-animations:** Use `AOS` for entry animations. Initialize it lazily in `app.js` to keep the bundle small.
+- **No Placeholders:** Use `generate_image` or high-quality Unsplash URLs for demo content.
 
 ---
 
-## Styling & Design System
+## 🛠 Frontend Development Standards
+1. **Dynamic Imports:** Always use dynamic `import()` for Inertia pages in `app.js` (`import.meta.glob('./Pages/**/*.vue')`) to enable code-splitting.
+2. **Synchronous Mount:** Ensure `app.mount(el)` is called immediately in `setup` to avoid blank page flashes during dynamic library loads.
+3. **Form Handling:** Use `useForm` for all data mutations. Ensure `preserveScroll: true` is used for non-navigation updates.
+4. **Global Components:** Generic elements like `Link`, `Head`, `font-awesome-icon`, and `FlashMessages` are registered globally in `app.js`.
 
-1. **Tailwind First:** Rely exclusively on Tailwind CSS utility classes. Avoid writing custom CSS rules in `<style scoped>` blocks unless necessary for highly complex or specific animations.
-2. **Brand Colors:** Use the pre-configured semantic classes (e.g., `text-primary`, `bg-primary`, `bg-dark`, `text-secondary`, etc.) for consistency.
-3. **Responsive Design:** Ensure all components are mobile-first and fully responsive using Tailwind breakpoint prefixes (`sm:`, `md:`, `lg:`, `xl:`).
+---
+
+## 📂 Store Settings Architecture
+- **Centralized Config:** All site-wide features (Shop toggle, Order tracking, Hero content) must be stored in the `store_settings` table.
+- **Model Usage:** Use `StoreSetting::allAsArray()` to fetch all settings for the frontend and `StoreSetting::set($key, $value)` for updates.
+- **Frontend Access:** Access settings via `$page.props.store_settings`. Use fallbacks in Vue templates to handle missing keys gracefully.
+
+---
+
+## 📦 Build & Deployment
+- **Vite Optimization:** Use `build.rollupOptions.output.manualChunks` to split large vendor libraries (`vue`, `inertia`, `fontawesome`) into separate chunks.
+- **CommonJS Gotchas:** Avoid putting UMD/CommonJS libraries (like `html2pdf.js`, `Quill`) into separate manual chunks if they break with `exports is undefined`. Let Vite handle them or import them dynamically within the component only.
+- **Bundle Level:** Keep the main bundle size warning threshold around `1000kB`.
+
+---
+
+## 🔐 Security & Backend
+- **Controller Logic:** Keep controllers lean. Use `StoreSetting` for configuration rather than hardcoding.
+- **Validation:** Strict validation for all admin inputs. File uploads (logos, images) should specify max sizes and allowed mime types.
+- **Auth:** Support Socialite (Google/Facebook) but ensure the fallback redirect logic is robust.
+
