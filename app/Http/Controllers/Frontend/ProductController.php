@@ -16,9 +16,20 @@ class ProductController extends Controller
         $query = Product::where('status', true)->with('category');
         
         if ($request->has('category')) {
-            $query->whereHas('category', function($q) use ($request) {
-                $q->where('slug', $request->category);
-            });
+            $slug = $request->category;
+            // Find the category by slug
+            $cat = Category::where('slug', $slug)->first();
+            if ($cat) {
+                if (is_null($cat->parent_id)) {
+                    // It's a parent: include products in this category OR any of its subcategories
+                    $childIds = $cat->children()->pluck('id')->toArray();
+                    $ids = array_merge([$cat->id], $childIds);
+                    $query->whereIn('category_id', $ids);
+                } else {
+                    // It's a subcategory: match directly
+                    $query->where('category_id', $cat->id);
+                }
+            }
         }
         
         if ($request->has('search')) {
@@ -45,9 +56,15 @@ class ProductController extends Controller
         $filters = $request->only(['search', 'category']);
         $filters['attrs'] = $attrs;
 
+        // Build categories with parent/child grouping for the sidebar filter
+        $categories = Category::whereNull('parent_id')
+            ->with(['children' => fn($q) => $q->orderBy('name')])
+            ->orderBy('name')
+            ->get(['id','name','slug','parent_id']);
+
         return Inertia::render('Frontend/Products/Index', [
             'products'     => $query->paginate(12)->withQueryString(),
-            'categories'   => Category::with('attributes')->get(),
+            'categories'   => $categories,
             'filters'      => $filters,
             'wishlist_ids' => $wishlistIds,
         ]);

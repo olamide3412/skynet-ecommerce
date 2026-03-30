@@ -29,8 +29,18 @@ const togglingWishlist = reactive({});
 const wishlistEnabled = computed(() => page.props.store_settings?.wishlist_enabled === '1');
 
 // Dynamic attributes for the selected category
+// Now categories is a tree, so search parents + children
+const allCategoriesFlat = computed(() => {
+    const flat = [];
+    for (const parent of (props.categories ?? [])) {
+        flat.push(parent);
+        if (parent.children?.length) flat.push(...parent.children);
+    }
+    return flat;
+});
+
 const activeCategoryParams = computed(() => {
-    return props.categories.find(c => c.slug === category.value) || null;
+    return allCategoriesFlat.value.find(c => c.slug === category.value) || null;
 });
 const activeAttributes = computed(() => activeCategoryParams.value?.attributes || []);
 
@@ -102,10 +112,15 @@ const showMobileFilters = ref(false);
 
 const breadcrumbs = computed(() => {
     const crumbs = [];
-    if (category.value && props.categories) {
-        const cat = props.categories.find(c => c.slug === category.value);
+    if (category.value && allCategoriesFlat.value.length) {
+        const cat = allCategoriesFlat.value.find(c => c.slug === category.value);
         if (cat) {
             crumbs.push({ label: 'All Products', url: route('shop.index') });
+            // If it's a subcategory, also add the parent
+            if (cat.parent_id) {
+                const parent = props.categories?.find(p => p.id === cat.parent_id);
+                if (parent) crumbs.push({ label: parent.name, url: route('shop.index', { category: parent.slug }) });
+            }
             crumbs.push({ label: cat.name });
             return crumbs;
         }
@@ -143,20 +158,39 @@ const breadcrumbs = computed(() => {
                         <!-- Category Filter Menu -->
                         <div class="bg-white dark:bg-gray-800 p-5 rounded-xl shadow-sm border dark:border-gray-700">
                             <h3 class="font-bold mb-4 uppercase text-sm tracking-wider text-gray-900 dark:text-gray-100">Categories</h3>
-                            <ul class="space-y-3 text-sm">
+                            <ul class="space-y-1 text-sm">
+                                <!-- All categories -->  
                                 <li>
                                     <button @click="category = ''; showMobileFilters = false"
-                                        :class="!category ? 'font-bold text-blue-600 dark:text-blue-400' : 'text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 transition'">
-                                        All Categories
+                                        class="text-left w-full px-2 py-1.5 rounded-lg transition"
+                                        :class="!category ? 'bg-blue-50 dark:bg-blue-900/20 font-bold text-blue-600 dark:text-blue-400' : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 hover:text-blue-600 dark:hover:text-blue-400'">
+                                        🏷️ All Categories
                                     </button>
                                 </li>
-                                <li v-for="cat in categories" :key="cat.id">
-                                    <button @click="category = cat.slug; showMobileFilters = false"
-                                        :class="category === cat.slug ? 'font-bold text-blue-600 dark:text-blue-400' : 'text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 transition'"
-                                        class="text-left w-full truncate">
-                                        {{ cat.name }}
-                                    </button>
-                                </li>
+
+                                <!-- Parent categories with optional subcategories -->
+                                <template v-for="parent in categories" :key="parent.id">
+                                    <!-- Parent button -->
+                                    <li>
+                                        <button @click="category = parent.slug; showMobileFilters = false"
+                                            class="text-left w-full px-2 py-1.5 rounded-lg transition font-semibold"
+                                            :class="category === parent.slug
+                                                ? 'bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400'
+                                                : 'text-gray-800 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700'">
+                                            📁 {{ parent.name }}
+                                        </button>
+                                    </li>
+                                    <!-- Subcategories indented beneath -->  
+                                    <li v-for="sub in parent.children" :key="sub.id" class="pl-4">
+                                        <button @click="category = sub.slug; showMobileFilters = false"
+                                            class="text-left w-full px-2 py-1 rounded-lg transition text-xs flex items-center gap-1"
+                                            :class="category === sub.slug
+                                                ? 'font-semibold text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-900/20'
+                                                : 'text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 hover:text-indigo-600 dark:hover:text-indigo-400'">
+                                            <span class="text-gray-300 dark:text-gray-600">↳</span> {{ sub.name }}
+                                        </button>
+                                    </li>
+                                </template>
                             </ul>
                         </div>
 
@@ -295,7 +329,7 @@ const breadcrumbs = computed(() => {
 
                         <button @click="addToCompare(product)" :disabled="comparing[product.id]"
                             title="Compare Product"
-                            class="py-2 px-3 rounded-lg bg-gray-100 hover:bg-blue-50 text-gray-700 hover:text-blue-600 dark:bg-gray-700 dark:hover:bg-gray-600 dark:text-gray-200 transition disabled:opacity-60 flex items-center justify-center border border-gray-200 dark:border-gray-600">
+                            class="py-2 px-3 rounded-lg bg-gray-100 hover:bg-blue-50 text-gray-700 hover:text-blue-600 dark:bg-gray-700 dark:hover:bg-gray-600 dark:text-gray-200 dark:hover:text-blue-300 transition disabled:opacity-60 flex items-center justify-center border border-gray-200 dark:border-gray-600">
                             <svg v-if="!comparing[product.id]" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"/>
                             </svg>

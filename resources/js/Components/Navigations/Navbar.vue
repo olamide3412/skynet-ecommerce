@@ -8,8 +8,9 @@ import ThemeToggle from '@/Components/ThemeToggle.vue';
 import debounce from 'lodash/debounce';
 
 const page = usePage();
-const isOpen = ref(false);
-const toggle = () => (isOpen.value = !isOpen.value);
+const isOpen        = ref(false);   // mobile drawer
+const megaMenuOpen  = ref(false);   // category mega menu
+const toggle        = () => (isOpen.value = !isOpen.value);
 
 // ── Search ─────────────────────────────────────────────────────
 const search       = ref('');
@@ -29,7 +30,7 @@ const fetchSuggestions = debounce(async (q) => {
     finally { loading.value = false; }
 }, 300);
 
-const onInput     = () => fetchSuggestions(search.value);
+const onInput      = () => fetchSuggestions(search.value);
 const submitSearch = () => {
     if (!search.value.trim()) return;
     showDropdown.value = false;
@@ -45,11 +46,21 @@ const viewAll = () => {
     router.get(route('shop.index'), { search: search.value });
 };
 
+// Mobile subcat accordion open state
+const openMobileCat = ref(null);
+const toggleMobileCat = (id) => {
+    openMobileCat.value = openMobileCat.value === id ? null : id;
+};
+
 const handleClickOutside = (e) => {
     if (searchRef.value && !searchRef.value.contains(e.target)) showDropdown.value = false;
 };
-onMounted(() => document.addEventListener('click', handleClickOutside));
-onUnmounted(() => document.removeEventListener('click', handleClickOutside));
+onMounted(() => {
+    document.addEventListener('click', handleClickOutside);
+});
+onUnmounted(() => {
+    document.removeEventListener('click', handleClickOutside);
+});
 
 // ── Helpers ────────────────────────────────────────────────────
 const cartCount       = computed(() => page.props.cart_count ?? 0);
@@ -58,10 +69,29 @@ const isCustomer      = computed(() => !!page.props.auth?.customer);
 const isStaff         = computed(() => !!page.props.auth?.user);
 const wishlistEnabled = computed(() => page.props.store_settings?.wishlist_enabled === '1');
 const categories      = computed(() => page.props.categories ?? []);
+const gridCols        = computed(() => Math.min(categories.value.length, 4));
+
+// Mega menu position (fixed, calculated from button)
+const catBtnRef     = ref(null);
+const menuStyle     = ref({});
+
+const openMegaMenu = (e) => {
+    e.stopPropagation();
+    if (megaMenuOpen.value) { megaMenuOpen.value = false; return; }
+    const rect = catBtnRef.value.getBoundingClientRect();
+    const isMobile = window.innerWidth < 640;
+    menuStyle.value = {
+        top:  rect.bottom + 4 + 'px',
+        // On mobile: pin to left edge with small margin
+        // On desktop: align with the button
+        left: isMobile ? '8px' : Math.max(8, rect.left) + 'px',
+    };
+    megaMenuOpen.value = true;
+};
 </script>
 
 <template>
-  <!-- fixed header: approx 44px (Row1) + 44px (Row2/search) + 36px (Row3 desktop cats) = ~124px desktop, ~88px mobile -->
+  <!-- fixed header -->
   <header class="fixed top-0 left-0 w-full z-50 bg-white dark:bg-gray-900 shadow-sm">
 
     <!-- ── ROW 1 : Logo | Icons | Hamburger ────────────────────── -->
@@ -160,7 +190,7 @@ const categories      = computed(() => page.props.categories ?? []);
       </div>
     </div>
 
-    <!-- ── ROW 2 : Search bar (always visible, every screen size) ── -->
+    <!-- ── ROW 2 : Search bar ──────────────────────────────────── -->
     <div class="bg-white dark:bg-gray-900 border-b dark:border-gray-800 px-3 sm:px-4 py-2">
       <div class="container mx-auto">
         <div ref="searchRef" class="relative">
@@ -227,26 +257,57 @@ const categories      = computed(() => page.props.categories ?? []);
       </div>
     </div>
 
-    <!-- ── ROW 3 : Category strip (scrollable on all sizes) ─────── -->
+    <!-- ── ROW 3 : Nav bar with Categories mega menu ─────────── -->
     <div class="bg-gray-50 dark:bg-gray-800 border-b dark:border-gray-700">
       <div class="container mx-auto px-3 sm:px-4">
-        <nav class="flex items-center gap-1 overflow-x-auto scrollbar-hide py-1.5">
+        <!-- NOTE: no overflow on this nav — mega menu must escape freely -->
+        <nav class="flex items-center gap-1 py-1.5 scrollbar-hide" style="overflow-x: auto; overflow-y: visible;">
+
+          <!-- ☰ Categories button (no relative wrapper so overflow doesn't clip) -->
+          <div id="mega-menu-wrapper" class="flex-shrink-0">
+            <button
+              ref="catBtnRef"
+              @click="openMegaMenu"
+              class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs sm:text-sm font-semibold transition whitespace-nowrap"
+              :class="megaMenuOpen ? 'bg-blue-600 text-white' : 'bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200 border border-gray-200 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-600'"
+            >
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M4 6h16M4 12h16M4 18h16"/>
+              </svg>
+              Categories
+              <svg class="w-3 h-3 transition-transform" :class="megaMenuOpen ? 'rotate-180' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+              </svg>
+            </button>
+          </div>
+
+          <!-- Separator -->
+          <span class="h-4 w-px bg-gray-300 dark:bg-gray-600 mx-1 flex-shrink-0"></span>
+
+          <!-- Home -->
           <Link :href="route('home')"
             class="flex-shrink-0 px-3 py-1.5 rounded-lg text-xs sm:text-sm font-semibold transition whitespace-nowrap"
             :class="$page.component === 'Home' ? 'bg-blue-600 text-white' : 'text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700'">
             🏠 Home
           </Link>
+
+          <!-- All Products -->
           <Link :href="route('shop.index')"
             class="flex-shrink-0 px-3 py-1.5 rounded-lg text-xs sm:text-sm font-semibold transition whitespace-nowrap"
             :class="$page.component.startsWith('Frontend/Products') ? 'bg-blue-600 text-white' : 'text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700'">
             🛍️ All Products
           </Link>
-          <span class="h-4 w-px bg-gray-300 dark:bg-gray-600 mx-1 flex-shrink-0"></span>
-          <Link v-for="cat in categories" :key="cat.id"
-            :href="route('shop.index', { category: cat.slug })"
-            class="flex-shrink-0 px-3 py-1.5 rounded-lg text-xs sm:text-sm font-medium transition whitespace-nowrap text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-700 hover:text-gray-900 dark:hover:text-white">
-            {{ cat.name }}
-          </Link>
+
+          <!-- Category pills — desktop only, max 3 -->
+          <template v-for="cat in categories.slice(0, 3)" :key="cat.id">
+            <Link
+              :href="route('shop.index', { category: cat.slug })"
+              class="hidden sm:inline-flex flex-shrink-0 px-3 py-1.5 rounded-lg text-xs sm:text-sm font-medium transition whitespace-nowrap text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-700 hover:text-gray-900 dark:hover:text-white">
+              {{ cat.name }}
+            </Link>
+          </template>
+
+          <!-- Track Order -->
           <Link :href="route('order.track')"
             class="flex-shrink-0 ml-auto px-3 py-1.5 rounded-lg text-xs sm:text-sm font-medium text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-700 transition whitespace-nowrap">
             📦 Track Order
@@ -268,12 +329,36 @@ const categories      = computed(() => page.props.categories ?? []);
               class="flex items-center gap-2 px-3 py-2.5 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition font-medium">🛍️ All Products</Link>
           </li>
           <li class="text-xs font-semibold text-gray-400 uppercase px-3 pt-2">Categories</li>
-          <li v-for="cat in categories" :key="cat.id">
-            <Link :href="route('shop.index', { category: cat.slug })" @click="toggle"
-              class="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition text-sm text-gray-600 dark:text-gray-400 pl-6">
-              {{ cat.name }}
-            </Link>
-          </li>
+
+          <!-- Mobile category with accordion for subcats -->
+          <template v-for="cat in categories" :key="cat.id">
+            <li>
+              <div class="flex items-center">
+                <Link :href="route('shop.index', { category: cat.slug })" @click="toggle"
+                  class="flex-1 flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition text-sm text-gray-700 dark:text-gray-300 font-medium">
+                  {{ cat.name }}
+                </Link>
+                <!-- Expand button if has subcats -->
+                <button v-if="cat.children?.length"
+                  @click.stop="toggleMobileCat(cat.id)"
+                  class="px-2 py-2 text-gray-500 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400">
+                  <svg class="w-4 h-4 transition-transform" :class="openMobileCat === cat.id ? 'rotate-180' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                  </svg>
+                </button>
+              </div>
+              <!-- Subcategories accordion -->
+              <ul v-if="cat.children?.length && openMobileCat === cat.id" class="pl-6 mt-1 space-y-0.5 border-l-2 border-blue-200 dark:border-blue-800 ml-5">
+                <li v-for="sub in cat.children" :key="sub.id">
+                  <Link :href="route('shop.index', { category: sub.slug })" @click="toggle"
+                    class="block px-3 py-1.5 rounded-lg text-sm text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-blue-600 dark:hover:text-blue-400 transition">
+                    {{ sub.name }}
+                  </Link>
+                </li>
+              </ul>
+            </li>
+          </template>
+
           <li class="border-t dark:border-gray-700 pt-2 mt-1">
             <Link :href="route('cart.index')" @click="toggle"
               class="flex items-center justify-between gap-2 px-3 py-2.5 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition font-medium">
@@ -322,11 +407,90 @@ const categories      = computed(() => page.props.categories ?? []);
     </transition>
 
   </header>
+
+  <!-- ── Mega Menu Teleport (rendered at body level to escape all overflow clipping) ── -->
+  <Teleport to="body">
+    <!-- Backdrop -->
+    <div v-if="megaMenuOpen"
+      class="fixed inset-0 z-[99] bg-black/20 dark:bg-black/40"
+      @click="megaMenuOpen = false">
+    </div>
+
+    <!-- Panel -->
+    <transition name="mega">
+      <div v-if="megaMenuOpen && categories.length"
+        class="fixed z-[100] bg-white dark:bg-gray-900 rounded-xl shadow-2xl border dark:border-gray-700 overflow-y-auto"
+        :style="{
+            top: menuStyle.top,
+            left: menuStyle.left,
+            // Mobile: full-width minus margins; desktop: max 900px
+            width: 'min(calc(100vw - 16px), 900px)',
+            maxHeight: '80vh',
+        }"
+        @click.stop>
+
+        <!-- Header on mobile -->
+        <div class="flex items-center justify-between px-4 py-3 border-b dark:border-gray-700 sm:hidden">
+          <span class="font-bold text-sm text-gray-800 dark:text-white">☰ All Categories</span>
+          <button @click="megaMenuOpen = false"
+            class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 p-1 rounded">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"/>
+            </svg>
+          </button>
+        </div>
+
+        <!-- Responsive grid:
+             mobile  : 1 col (stacked list)
+             sm/md   : 2 col
+             lg+     : 3 or 4 col based on category count -->
+        <div class="p-4 sm:p-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-6">
+
+          <div v-for="cat in categories" :key="cat.id"
+            class="sm:border-0 border-b dark:border-gray-800 pb-3 sm:pb-0 last:border-0">
+
+            <!-- Parent category header -->
+            <Link
+              :href="route('shop.index', { category: cat.slug })"
+              @click="megaMenuOpen = false"
+              class="flex items-center gap-2 font-bold text-gray-900 dark:text-white text-xs sm:text-sm hover:text-blue-600 dark:hover:text-blue-400 transition mb-2">
+              <span class="w-5 h-5 sm:w-6 sm:h-6 bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 rounded flex items-center justify-center text-[10px] flex-shrink-0">📁</span>
+              <span class="truncate">{{ cat.name }}</span>
+            </Link>
+
+            <!-- Subcategories -->
+            <ul v-if="cat.children?.length" class="space-y-0.5 sm:space-y-1 mb-2 border-l-2 border-gray-100 dark:border-gray-700 pl-2 sm:pl-3">
+              <li v-for="sub in cat.children" :key="sub.id">
+                <Link
+                  :href="route('shop.index', { category: sub.slug })"
+                  @click="megaMenuOpen = false"
+                  class="text-[11px] sm:text-sm text-gray-500 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 transition block py-0.5 truncate">
+                  {{ sub.name }}
+                </Link>
+              </li>
+            </ul>
+
+            <!-- View all -->
+            <Link
+              :href="route('shop.index', { category: cat.slug })"
+              @click="megaMenuOpen = false"
+              class="text-[11px] sm:text-xs text-blue-600 dark:text-blue-400 font-semibold hover:underline inline-flex items-center gap-0.5">
+              View all →
+            </Link>
+          </div>
+        </div>
+      </div>
+    </transition>
+  </Teleport>
 </template>
 
 <style scoped>
 .slide-enter-active, .slide-leave-active { transition: all 0.25s ease; }
 .slide-enter-from, .slide-leave-to { transform: translateY(-8px); opacity: 0; }
+
+.mega-enter-active, .mega-leave-active { transition: all 0.2s ease; }
+.mega-enter-from, .mega-leave-to { transform: translateY(-6px); opacity: 0; }
+
 .scrollbar-hide::-webkit-scrollbar { display: none; }
 .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
 </style>

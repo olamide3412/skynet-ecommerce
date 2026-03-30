@@ -48,10 +48,10 @@ class HandleInertiaRequests extends Middleware
                 'check' => $this->isAuthenticated(),
                 'type' => $this->getAuthType(),
             ],
-             'flash' => [
-                'success' => fn () => $request->session()->get('success'),
-                'error' => fn () => $request->session()->get('error'),
-                'message' => fn () => $request->session()->get('message')
+            'flash' => [
+                'success' => fn() => $request->session()->get('success'),
+                'error' => fn() => $request->session()->get('error'),
+                'message' => fn() => $request->session()->get('message')
             ],
             'support' => [
                 'phone' => '+2348032072831',
@@ -60,43 +60,51 @@ class HandleInertiaRequests extends Middleware
                 'email' => 'support@skynetdigitalhub.com.ng',
                 'location' => 'Delta State, Nigeria'
             ],
-            'csrf_token'     => csrf_token(),
+            'csrf_token' => csrf_token(),
             'turnstileSiteKey' => config('services.turnstile.site_key'),
-            'cart_count'     => fn () => $this->getCartCount($request),
-            'compare_count'  => fn () => $this->getCompareCount($request),
-            'store_settings' => fn () => StoreSetting::allAsArray(),
-            'categories'     => fn () => \App\Models\Category::where('visible_in_menu', true)
-                                    ->orderBy('menu_position')
-                                    ->orderBy('name')
-                                    ->get(['id','name','slug']),
+            'cart_count' => fn() => $this->getCartCount($request),
+            'compare_count' => fn() => $this->getCompareCount($request),
+            'store_settings' => fn() => StoreSetting::allAsArray(),
+            'categories' => fn() => \App\Models\Category::whereNull('parent_id')
+                ->where('visible_in_menu', true)
+                ->with([
+                    'children' => fn($q) => $q
+                        ->where('visible_in_menu', true)
+                        ->orderBy('menu_position', 'asc')
+                ])
+                ->orderBy('menu_position', 'asc')
+                ->get(['id', 'name', 'slug', 'parent_id', 'menu_position', 'image']),
         ];
     }
 
     protected function getAuthUser($guard)
     {
         try {
-            return fn () => Auth::guard($guard)->check() ? Auth::guard($guard)->user() : null;
+            return fn() => Auth::guard($guard)->check() ? Auth::guard($guard)->user() : null;
         } catch (\InvalidArgumentException $e) {
-            return fn () => null;
+            return fn() => null;
         }
     }
 
     protected function isAuthenticated()
     {
         try {
-            return fn () => Auth::guard('web')->check() || Auth::guard('customer')->check();
+            return fn() => Auth::guard('web')->check() || Auth::guard('customer')->check();
         } catch (\InvalidArgumentException $e) {
-            return fn () => Auth::guard('web')->check();
+            return fn() => Auth::guard('web')->check();
         }
     }
 
     protected function getAuthType()
     {
         try {
-            if (Auth::guard('web')->check()) return 'staff';
-            if (Auth::guard('customer')->check()) return 'customer';
+            if (Auth::guard('web')->check())
+                return 'staff';
+            if (Auth::guard('customer')->check())
+                return 'customer';
         } catch (\InvalidArgumentException $e) {
-            if (Auth::guard('web')->check()) return 'staff';
+            if (Auth::guard('web')->check())
+                return 'staff';
         }
         return null;
     }

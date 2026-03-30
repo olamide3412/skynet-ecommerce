@@ -7,7 +7,7 @@ import Footer from '@/Components/Footer.vue';
 defineProps({
     featured_products: Array,
     new_arrivals: Array,
-    categories: Array
+    home_categories: Array
 });
 
 const toast = useToast();
@@ -66,19 +66,19 @@ const addToCart = (product) => {
         </section>
 
         <!-- Categories Section -->
-        <section class="py-20 bg-white dark:bg-dark container mx-auto px-4">
-            <div class="flex justify-between items-end mb-10">
+        <section class="py-12 md:py-20 bg-white dark:bg-dark container mx-auto px-4">
+            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-end mb-8 md:mb-10 gap-2">
                 <div>
-                    <h2 class="text-3xl font-bold text-gray-900 dark:text-white">Shop by Category</h2>
-                    <p class="text-gray-500 dark:text-gray-400 mt-2">Find exactly what you need quickly</p>
+                    <h2 class="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white">Shop by Category</h2>
+                    <p class="text-sm md:text-base text-gray-500 dark:text-gray-400 mt-2">Find exactly what you need quickly</p>
                 </div>
             </div>
-            <div class="grid grid-cols-2 md:grid-cols-4 gap-6">
-                <Link :href="route('shop.index', {category: category.slug})" v-for="category in categories" :key="category.id" class="group relative overflow-hidden rounded-xl aspect-square shadow-sm border dark:border-gray-800">
-                    <div class="absolute inset-0 bg-gray-900 opacity-40 group-hover:opacity-30 transition-opacity z-10"></div>
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-6">
+                <Link :href="route('shop.index', {category: category.slug})" v-for="category in home_categories" :key="category.id" class="group relative overflow-hidden rounded-xl aspect-[4/3] sm:aspect-square shadow-sm border dark:border-gray-800">
+                    <div class="absolute inset-0 bg-gradient-to-t from-gray-900/80 via-gray-900/30 to-transparent opacity-80 group-hover:opacity-100 transition-opacity z-10"></div>
                     <img :src="category.image ? '/storage/' + category.image : 'https://source.unsplash.com/random/400x400/?'+category.name" class="w-full h-full object-cover transform group-hover:scale-110 transition duration-700" :alt="category.name" onerror="this.src='https://placehold.co/400x400'"/>
-                    <div class="absolute inset-0 z-20 flex items-center justify-center">
-                        <h3 class="text-white text-2xl font-bold tracking-wide">{{ category.name }}</h3>
+                    <div class="absolute inset-0 z-20 flex items-end justify-center p-4">
+                        <h3 class="text-white text-base sm:text-xl md:text-2xl font-bold tracking-wide text-center drop-shadow-lg">{{ category.name }}</h3>
                     </div>
                 </Link>
             </div>
@@ -133,7 +133,7 @@ const addToCart = (product) => {
                     <h2 class="text-3xl font-bold text-gray-900 dark:text-white">New Arrivals</h2>
                     <p class="text-gray-500 dark:text-gray-400 mt-2">The latest trends and tech</p>
                 </div>
-                <Link :href="route('shop.index')" class="hidden md:inline-flex items-center text-blue-600 dark:text-blue-400 hover:text-blue-800 font-semibold group">
+                <Link :href="route('shop.index')" class="hidden md:inline-flex items-center text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 font-semibold group">
                     View All
                     <svg class="w-4 h-4 ml-2 transform group-hover:translate-x-1 transition" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
                 </Link>
@@ -145,7 +145,7 @@ const addToCart = (product) => {
                         <div class="absolute top-4 left-4 z-20 bg-emerald-500 text-white text-xs font-bold px-3 py-1 rounded shadow-lg">NEW</div>
                     </div>
                     <div class="p-5 flex flex-col flex-grow">
-                        <Link :href="route('shop.show', product.url_key)" class="text-md font-bold text-gray-900 dark:text-white hover:text-blue-600 transition mb-2 line-clamp-1">{{ product.name }}</Link>
+                        <Link :href="route('shop.show', product.url_key)" class="text-md font-bold text-gray-900 dark:text-white hover:text-blue-600 dark:hover:text-blue-400 transition mb-2 line-clamp-1">{{ product.name }}</Link>
                         <div class="mt-auto flex items-center justify-between">
                             <span class="text-lg font-bold text-gray-900 dark:text-white">₦{{ parseFloat(product.price).toLocaleString() }}</span>
                             <button @click="addToCart(product)" :disabled="addingToCart[product.id]" class="text-sm font-semibold bg-blue-600 hover:bg-blue-700 text-white px-3 py-1.5 rounded-lg transition disabled:opacity-60 flex items-center gap-1">

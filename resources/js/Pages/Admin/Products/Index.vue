@@ -296,7 +296,13 @@ const deleteProduct = (id) => {
                     <select v-model="filterCategory" 
                         class="w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white px-3 py-2 text-sm focus:ring-blue-500 focus:border-blue-500">
                         <option value="">All Categories</option>
-                        <option v-for="cat in categories" :key="cat.id" :value="cat.id">{{ cat.name }}</option>
+                        <template v-for="parent in categories" :key="parent.id">
+                            <optgroup v-if="parent.children?.length" :label="parent.name">
+                                <option :value="parent.id">{{ parent.name }} (All)</option>
+                                <option v-for="sub in parent.children" :key="sub.id" :value="sub.id">↳ {{ sub.name }}</option>
+                            </optgroup>
+                            <option v-else :value="parent.id">{{ parent.name }}</option>
+                        </template>
                     </select>
                 </div>
 
@@ -409,8 +415,19 @@ const deleteProduct = (id) => {
                                     <label class="block text-sm font-semibold mb-1">Category *</label>
                                     <select v-model="form.category_id" required
                                         class="w-full rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700 focus:ring-blue-500 shadow-sm">
-                                        <option value="" disabled>Select category</option>
-                                        <option v-for="cat in categories" :value="cat.id" :key="cat.id">{{ cat.name }}</option>
+                                        <option value="" disabled>— Select a category —</option>
+                                        <template v-for="parent in categories" :key="parent.id">
+                                            <!-- If parent has subcategories, use optgroup -->
+                                            <optgroup v-if="parent.children?.length" :label="'📁 ' + parent.name">
+                                                <!-- Parent itself is selectable (products with no specific subcat) -->
+                                                <option :value="parent.id">{{ parent.name }} (General)</option>
+                                                <option v-for="sub in parent.children" :key="sub.id" :value="sub.id">
+                                                    ↳ {{ sub.name }}
+                                                </option>
+                                            </optgroup>
+                                            <!-- Parent with no subcategories: just a plain option -->
+                                            <option v-else :value="parent.id">📁 {{ parent.name }}</option>
+                                        </template>
                                     </select>
                                     <p v-if="form.errors.category_id" class="text-red-500 text-xs mt-1">{{ form.errors.category_id }}</p>
                                 </div>

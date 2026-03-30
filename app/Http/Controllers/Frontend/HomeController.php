@@ -14,7 +14,10 @@ class HomeController extends Controller
         return Inertia::render('Home', [
             'featured_products' => Product::with('category')->where('status', true)->inRandomOrder()->take(4)->get(),
             'new_arrivals' => Product::with('category')->where('status', true)->latest()->take(4)->get(),
-            'categories' => Category::take(4)->get(),
+            'home_categories' => Category::whereNull('parent_id')
+                ->orderBy('menu_position')
+                ->take(8)
+                ->get(['id', 'name', 'slug', 'image']),
         ]);
     }
 }

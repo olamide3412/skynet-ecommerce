@@ -33,7 +33,10 @@ class ProductController extends Controller
 
         return Inertia::render('Admin/Products/Index', [
             'products'       => $query->paginate(15)->withQueryString(),
-            'categories'     => Category::with('attributes')->orderBy('name')->get(['id','name']),
+            'categories'     => Category::whereNull('parent_id')
+                ->with(['children' => fn($q) => $q->orderBy('name')])
+                ->orderBy('name')
+                ->get(['id','name','parent_id']),
             'store_settings' => \App\Models\StoreSetting::allAsArray(),
             'filters'        => $request->only(['search', 'category_id', 'status'])
         ]);

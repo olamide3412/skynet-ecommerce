@@ -15,11 +15,12 @@ class CategoryController extends Controller
     {
         return Inertia::render('Admin/Categories/Index', [
             'categories' => Category::withCount('products')
-                ->with('attributes:id,name')
+                ->with(['attributes:id,name', 'parent:id,name', 'children:id,name,parent_id'])
                 ->orderBy('menu_position')
                 ->orderBy('name')
-                ->paginate(20),
-            'attributes' => Attribute::orderBy('name')->get(['id', 'name', 'type']),
+                ->paginate(50),
+            'attributes'        => Attribute::orderBy('name')->get(['id', 'name', 'type']),
+            'parent_categories' => Category::whereNull('parent_id')->orderBy('menu_position', 'asc')->get(['id', 'name', 'menu_position']),
         ]);
     }
 
@@ -28,6 +29,7 @@ class CategoryController extends Controller
         $validated = $request->validate([
             'name'             => 'required|string|max:255',
             'description'      => 'nullable|string',
+            'parent_id'        => 'nullable|exists:categories,id',
             'visible_in_menu'  => 'boolean',
             'menu_position'    => 'nullable|integer|min:0',
             'attribute_ids'    => 'nullable|array',
@@ -41,6 +43,7 @@ class CategoryController extends Controller
         $validated['slug'] = Str::slug($validated['name']);
         $validated['visible_in_menu'] = $validated['visible_in_menu'] ?? true;
         $validated['menu_position']   = $validated['menu_position'] ?? 0;
+        $validated['parent_id']       = $validated['parent_id'] ?? null;
 
         if ($request->hasFile('image')) {
             $validated['image'] = $request->file('image')->store('categories', 'public');
@@ -57,6 +60,7 @@ class CategoryController extends Controller
         $validated = $request->validate([
             'name'             => 'required|string|max:255',
             'description'      => 'nullable|string',
+            'parent_id'        => 'nullable|exists:categories,id',
             'visible_in_menu'  => 'boolean',
             'menu_position'    => 'nullable|integer|min:0',
             'attribute_ids'    => 'nullable|array',
@@ -69,6 +73,9 @@ class CategoryController extends Controller
         unset($validated['attribute_ids']);
 
         $validated['slug'] = Str::slug($validated['name']);
+        $validated['parent_id'] = $validated['parent_id'] ?? null;
+        $validated['visible_in_menu'] = $validated['visible_in_menu'] ?? true;
+        $validated['menu_position']   = $validated['menu_position'] ?? 0;
 
         if ($request->hasFile('image')) {
             if ($category->image) {
