@@ -27,6 +27,9 @@ class SettingsController extends Controller
             'company_tagline'               => 'nullable|string|max:500',
 
             // Homepage Hero Content
+            'home_slider_enabled'           => 'boolean',
+            'home_marquee_enabled'          => 'boolean',
+            'home_marquee_text'             => 'nullable|string|max:500',
             'hero_enabled'                  => 'boolean',
             'hero_badge'                    => 'nullable|string|max:100',
             'hero_title'                    => 'nullable|string|max:255',

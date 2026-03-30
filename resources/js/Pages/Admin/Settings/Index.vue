@@ -16,7 +16,10 @@ const form = useForm({
     company_phone:          props.settings.company_phone || '+2348032072831',
     company_address:        props.settings.company_address || 'Delta State, Nigeria',
     company_logo:           null,
-    // Homepage Hero
+    // Homepage Hero & Slider
+    home_slider_enabled:    props.settings.home_slider_enabled !== '0',
+    home_marquee_enabled:   props.settings.home_marquee_enabled !== '0',
+    home_marquee_text:      props.settings.home_marquee_text || 'E.E.W TECHNOLOGY LTD SHOP NOW',
     hero_enabled:           props.settings.hero_enabled !== '0',
     hero_badge:             props.settings.hero_badge || 'New Collection 2026',
     hero_title:             props.settings.hero_title || 'Discover Digital',
@@ -177,6 +180,42 @@ const toggleSwitch = `relative w-11 h-6 bg-gray-200 peer-focus:outline-none peer
                         <p class="text-sm text-gray-500 dark:text-gray-400">Edit the text and image displayed on the storefront homepage hero and feature blocks.</p>
                     </div>
                     <div class="p-6 space-y-6">
+
+                        <!-- Slider & Marquee Setting -->
+                        <div class="border border-indigo-100 dark:border-indigo-900/50 bg-indigo-50/30 dark:bg-indigo-900/10 rounded-xl p-5 mb-6 shadow-sm">
+                            <h3 class="text-sm font-bold uppercase tracking-wider text-indigo-700 dark:text-indigo-400 mb-4 flex items-center gap-2">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                                Dynamic Hero Slider & Marquee
+                            </h3>
+                            <div class="flex flex-col md:flex-row gap-8">
+                                <!-- Dynamic Slider Toggle -->
+                                <div class="flex-1 space-y-4">
+                                    <div class="flex items-center justify-between">
+                                        <label class="text-sm font-semibold text-gray-900 dark:text-gray-200">Enable Slider Gallery</label>
+                                        <label class="inline-flex items-center cursor-pointer">
+                                            <input type="checkbox" v-model="form.home_slider_enabled" class="sr-only peer">
+                                            <div :class="toggleSwitch"></div>
+                                        </label>
+                                    </div>
+                                    <p class="text-xs text-gray-500">Replaces the static hero section with the slides managed in the <a href="/admin/sliders" class="text-indigo-600 font-bold hover:underline" target="_blank">Sliders menu</a>.</p>
+                                </div>
+                                <!-- Marquee Setting -->
+                                <div class="flex-1 space-y-4 border-t md:border-t-0 md:border-l border-gray-200 dark:border-gray-700 pt-4 md:pt-0 md:pl-8">
+                                    <div class="flex items-center justify-between">
+                                        <label class="text-sm font-semibold text-gray-900 dark:text-gray-200">Enable Text Banner</label>
+                                        <label class="inline-flex items-center cursor-pointer">
+                                            <input type="checkbox" v-model="form.home_marquee_enabled" class="sr-only peer">
+                                            <div :class="toggleSwitch"></div>
+                                        </label>
+                                    </div>
+                                    <div v-if="form.home_marquee_enabled">
+                                        <label class="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1">Banner Text</label>
+                                        <input type="text" v-model="form.home_marquee_text" class="w-full rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-800 px-3 py-2 text-sm" placeholder="E.E.W TECHNOLOGY LTD SHOP NOW" />
+                                    </div>
+                                    <p class="text-xs text-gray-500">Displays a full-width text bar directly below the hero area.</p>
+                                </div>
+                            </div>
+                        </div>
 
                         <!-- Hero Badge + Title -->
                         <div>

@@ -13,6 +13,7 @@ use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\Admin\ProductController as AdminProductController;
 use App\Http\Controllers\Admin\OrderController;
 use App\Http\Controllers\Admin\SettingsController;
+use App\Http\Controllers\Admin\SliderController;
 use App\Http\Controllers\Frontend\HomeController;
 use App\Http\Controllers\Frontend\CustomerAuthController;
 use Illuminate\Support\Facades\Route;
@@ -98,6 +99,7 @@ Route::prefix('admin')->name('admin.')->group(function () {
             Route::put('/profile/password', [ProfileController::class , 'updatePassword'])->name('profile.password.update');
 
             Route::resource('categories', CategoryController::class)->except(['create', 'edit', 'show']);
+            Route::resource('sliders', SliderController::class)->except(['create', 'edit', 'show']);
             Route::resource('products', AdminProductController::class)->except(['create', 'edit', 'show']);
             Route::get('products/search-related', [AdminProductController::class , 'searchRelated'])->name('products.search-related');
             Route::get('products/related-by-ids', [AdminProductController::class , 'relatedByIds'])->name('products.related-by-ids');

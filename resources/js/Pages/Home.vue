@@ -1,13 +1,18 @@
 <script setup>
 import { Head, Link, useForm } from '@inertiajs/vue3';
 import Layout from '@/Layouts/Layout.vue';
-import { reactive } from 'vue';
+import { ref, reactive, onMounted, onUnmounted } from 'vue';
 import { useToast } from 'vue-toastification';
 import Footer from '@/Components/Footer.vue';
-defineProps({
+
+const props = defineProps({
     featured_products: Array,
     new_arrivals: Array,
-    home_categories: Array
+    home_categories: Array,
+    sliders: {
+        type: Array,
+        default: () => []
+    }
 });
 
 const toast = useToast();
@@ -22,13 +27,85 @@ const addToCart = (product) => {
         onFinish:  () => { addingToCart[product.id] = false; },
     });
 };
+
+// ─── Slider Logic ───────────────────────────────────────────────
+const currentSlide = ref(0);
+let slideInterval = null;
+
+const nextSlide = () => {
+    if (!props.sliders?.length) return;
+    currentSlide.value = (currentSlide.value + 1) % props.sliders.length;
+};
+
+const prevSlide = () => {
+    if (!props.sliders?.length) return;
+    currentSlide.value = currentSlide.value === 0 ? props.sliders.length - 1 : currentSlide.value - 1;
+};
+
+const goToSlide = (index) => {
+    currentSlide.value = index;
+};
+
+onMounted(() => {
+    if (props.sliders?.length > 1) {
+        slideInterval = setInterval(nextSlide, 5000);
+    }
+});
+
+onUnmounted(() => {
+    if (slideInterval) clearInterval(slideInterval);
+});
 </script>
 
 <template>
     <Head :title="'Welcome to ' + ($page.props.store_settings.company_name || 'Skynet Digital Store')" />
     <Layout>
-        <!-- Hero Section -->
-        <section v-if="$page.props.store_settings.hero_enabled !== '0'" class="relative bg-gray-50 dark:bg-gray-900 border-b dark:border-gray-800">
+        <!-- Dynamic Hero Slider -->
+        <section v-if="$page.props.store_settings.home_slider_enabled !== '0' && sliders && sliders.length > 0" class="relative bg-gray-900 border-b dark:border-gray-800 overflow-hidden h-[200px] md:h-[300px] lg:h-[400px]">
+            <div v-for="(slider, index) in sliders" :key="slider.id"
+                class="absolute inset-0 transition-opacity duration-1000 ease-in-out"
+                :class="index === currentSlide ? 'opacity-100 z-10' : 'opacity-0 z-0'">
+                <!-- Background Image -->
+                <div class="absolute inset-0">
+                    <img :src="'/storage/' + slider.image_path" class="w-full h-full object-cover object-center" alt="Slider Image" />
+                    <!-- Gradient Overlay (Only if text exists) -->
+                    <div v-if="slider.title || slider.subtitle" class="absolute inset-0 bg-gradient-to-r from-gray-900/80 via-gray-900/40 to-transparent"></div>
+                </div>
+                <!-- Content -->
+                <div v-if="slider.title || slider.subtitle || slider.button_text" class="relative z-20 container mx-auto px-10 h-full flex flex-col justify-center">
+                    <div class="max-w-2xl transform transition-transform duration-1000" :class="index === currentSlide ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'">
+                        <h2 v-if="slider.title" class="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-extrabold text-white leading-tight mb-2 md:mb-3 drop-shadow-lg">
+                            {{ slider.title }}
+                        </h2>
+                        <p v-if="slider.subtitle" class="text-sm md:text-lg font-medium text-gray-100 mb-4 md:mb-6 drop-shadow-md max-w-xl">
+                            {{ slider.subtitle }}
+                        </p>
+                        <Link v-if="slider.button_text && slider.button_link" :href="slider.button_link" class="inline-block bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-6 sm:py-3 sm:px-8 md:py-4 md:px-10 text-sm sm:text-base rounded-full shadow-2xl hover:shadow-blue-600/50 transition-all duration-300 transform hover:-translate-y-1">
+                            {{ slider.button_text }} &rarr;
+                        </Link>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Slider Controls -->
+            <button v-if="sliders.length > 1" @click="prevSlide" class="absolute left-2 md:left-6 top-1/2 -translate-y-1/2 z-30 w-10 h-10 md:w-14 md:h-14 flex items-center justify-center rounded-full bg-black/20 hover:bg-black/60 text-white backdrop-blur-md border border-white/20 transition-all">
+                <svg class="w-6 h-6 md:w-8 md:h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+            </button>
+            <button v-if="sliders.length > 1" @click="nextSlide" class="absolute right-2 md:right-6 top-1/2 -translate-y-1/2 z-30 w-10 h-10 md:w-14 md:h-14 flex items-center justify-center rounded-full bg-black/20 hover:bg-black/60 text-white backdrop-blur-md border border-white/20 transition-all">
+                <svg class="w-6 h-6 md:w-8 md:h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+            </button>
+
+            <!-- Dots -->
+            <div v-if="sliders.length > 1" class="absolute bottom-6 left-1/2 -translate-x-1/2 z-30 flex gap-2">
+                <button v-for="(_, index) in sliders" :key="'dot-'+index" @click="goToSlide(index)"
+                    class="h-3 rounded-full transition-all duration-300 shadow"
+                    :class="index === currentSlide ? 'bg-blue-500 w-10' : 'bg-white/50 hover:bg-white w-3'">
+                </button>
+            </div>
+        </section>
+
+        <!-- Static Hero Fallback -->
+        <section v-else-if="$page.props.store_settings.hero_enabled !== '0'" class="relative bg-gray-50 dark:bg-gray-900 border-b dark:border-gray-800">
             <div class="container mx-auto px-4 py-20 lg:py-32 flex flex-col lg:flex-row items-center gap-12">
                 <div class="lg:w-1/2" data-aos="fade-right">
                     <span class="text-blue-600 dark:text-blue-400 font-bold tracking-wider uppercase text-sm mb-4 block">
@@ -62,6 +139,15 @@ const addToCart = (product) => {
                         class="relative z-10 w-full rounded-2xl shadow-2xl object-cover h-[500px]"
                     />
                 </div>
+            </div>
+        </section>
+
+        <!-- Dynamic Text Marquee / Banner -->
+        <section v-if="$page.props.store_settings.home_marquee_enabled !== '0'" class="bg-gray-50 dark:bg-gray-900 border-b dark:border-gray-800 py-6 shadow-sm overflow-hidden whitespace-nowrap">
+            <div class="container mx-auto px-4 text-center">
+                <h2 class="text-xl md:text-3xl font-serif font-black text-gray-900 dark:text-white tracking-widest uppercase">
+                    {{ $page.props.store_settings.home_marquee_text || 'E.E.W TECHNOLOGY LTD SHOP NOW' }}
+                </h2>
             </div>
         </section>
 
