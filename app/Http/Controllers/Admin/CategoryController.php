@@ -28,6 +28,7 @@ class CategoryController extends Controller
     {
         $validated = $request->validate([
             'name'             => 'required|string|max:255',
+            'slug'             => 'required|string|max:255|unique:categories,slug',
             'description'      => 'nullable|string',
             'parent_id'        => 'nullable|exists:categories,id',
             'visible_in_menu'  => 'boolean',
@@ -40,7 +41,8 @@ class CategoryController extends Controller
         $attributeIds = $validated['attribute_ids'] ?? [];
         unset($validated['attribute_ids']);
 
-        $validated['slug'] = Str::slug($validated['name']);
+        // ensure slug is sanitized if any spaces slipped in
+        $validated['slug'] = Str::slug($validated['slug']);
         $validated['visible_in_menu'] = $validated['visible_in_menu'] ?? true;
         $validated['menu_position']   = $validated['menu_position'] ?? 0;
         $validated['parent_id']       = $validated['parent_id'] ?? null;
@@ -59,6 +61,7 @@ class CategoryController extends Controller
     {
         $validated = $request->validate([
             'name'             => 'required|string|max:255',
+            'slug'             => "required|string|max:255|unique:categories,slug,{$category->id}",
             'description'      => 'nullable|string',
             'parent_id'        => 'nullable|exists:categories,id',
             'visible_in_menu'  => 'boolean',
@@ -72,7 +75,7 @@ class CategoryController extends Controller
         $attributeIds = $validated['attribute_ids'] ?? [];
         unset($validated['attribute_ids']);
 
-        $validated['slug'] = Str::slug($validated['name']);
+        $validated['slug'] = Str::slug($validated['slug']);
         $validated['parent_id'] = $validated['parent_id'] ?? null;
         $validated['visible_in_menu'] = $validated['visible_in_menu'] ?? true;
         $validated['menu_position']   = $validated['menu_position'] ?? 0;

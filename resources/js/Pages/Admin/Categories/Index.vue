@@ -2,7 +2,7 @@
 import { Head, Link, useForm } from '@inertiajs/vue3';
 import AdminLayout from '@/Layouts/AdminLayout.vue';
 import Pagination from '@/Components/Pagination.vue';
-import { ref, computed, nextTick } from 'vue';
+import { ref, computed, nextTick, watch } from 'vue';
 import { useToast } from 'vue-toastification';
 
 const toast = useToast();
@@ -11,6 +11,20 @@ const props = defineProps({
     attributes:        Array,
     parent_categories: Array,
 });
+
+const generateSlug = (text) => {
+    return text.toString().toLowerCase()
+        .replace(/\s+/g, '-')           
+        .replace(/[^\w\-]+/g, '')       
+        .replace(/\-\-+/g, '-')         
+        .replace(/^-+/, '')             
+        .replace(/-+$/, '');            
+};
+
+const slugChangedManually = ref(false);
+const handleSlugInput = () => {
+    slugChangedManually.value = true;
+};
 
 // ── Active Tab ─────────────────────────────────────────────────
 const activeTab = ref('parents');   // 'parents' | 'subcategories'
@@ -29,6 +43,7 @@ const formRef      = ref(null);
 const form = useForm({
     _method:         'POST',
     name:            '',
+    slug:            '',
     description:     '',
     parent_id:       null,
     image:           null,
@@ -46,6 +61,12 @@ const save = () => {
     }
 };
 
+watch(() => form.name, (newName) => {
+    if (!slugChangedManually.value && !isEditing.value) {
+        form.slug = generateSlug(newName);
+    }
+});
+
 // Open blank form for a new entry
 const openNewForm = () => {
     resetForm();
@@ -62,6 +83,7 @@ const editMode = (category) => {
     editId.value      = category.id;
     form._method      = 'PUT';
     form.name         = category.name;
+    form.slug         = category.slug || generateSlug(category.name);
     form.description  = category.description || '';
     form.parent_id    = category.parent_id ?? null;
     form.image        = null;
@@ -82,6 +104,7 @@ const resetForm = () => {
     form.reset();
     form.clearErrors();
     form._method         = 'POST';
+    slugChangedManually.value = false;
     form.image           = null;
     form.remove_image    = false;
     form.parent_id       = null;
@@ -131,6 +154,7 @@ const toggleVisibility = (cat) => {
     useForm({
         _method:         'PUT',
         name:            cat.name,
+        slug:            cat.slug,
         description:     cat.description ?? '',
         parent_id:       cat.parent_id ?? null,
         visible_in_menu: !cat.visible_in_menu,
@@ -293,6 +317,18 @@ const toggleVisibility = (cat) => {
                                         :placeholder="activeTab === 'parents' ? 'e.g. Mobile Phones' : 'e.g. iPhones'"
                                         class="w-full rounded-lg border border-gray-300 dark:border-gray-600 dark:bg-gray-800 px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500"/>
                                     <p v-if="form.errors.name" class="text-red-500 text-xs mt-1">{{ form.errors.name }}</p>
+                                </div>
+
+                                <!-- Slug -->
+                                <div>
+                                    <label class="block text-sm font-semibold mb-1">
+                                        URL Slug *
+                                        <span class="font-normal text-gray-400 ml-1">— used for web link</span>
+                                    </label>
+                                    <input v-model="form.slug" type="text" required @input="handleSlugInput"
+                                        placeholder="e.g. mobile-phones"
+                                        class="w-full rounded-lg border border-gray-300 dark:border-gray-600 dark:bg-gray-800 px-3 py-2 text-sm font-mono focus:ring-2 focus:ring-blue-500"/>
+                                    <p v-if="form.errors.slug" class="text-red-500 text-xs mt-1">{{ form.errors.slug }}</p>
                                 </div>
 
                                 <!-- Parent selector (subcategories only) -->
