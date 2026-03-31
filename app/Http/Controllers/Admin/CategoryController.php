@@ -90,6 +90,9 @@ class CategoryController extends Controller
                 \Illuminate\Support\Facades\Storage::disk('public')->delete($category->image);
             }
             $validated['image'] = null;
+        } else {
+            // Neither uploading a new image nor removing the old one, so don't update the image column
+            unset($validated['image']);
         }
 
         unset($validated['remove_image']);
