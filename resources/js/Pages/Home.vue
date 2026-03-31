@@ -147,8 +147,8 @@ onUnmounted(() => {
         <!-- Dynamic Text Marquee / Banner -->
         <section v-if="$page.props.store_settings.home_marquee_enabled !== '0'" class="bg-gray-50 dark:bg-gray-900 border-b dark:border-gray-800 py-6 shadow-sm overflow-hidden whitespace-nowrap">
             <div class="container mx-auto px-4 text-center">
-                <h2 class="text-xl md:text-3xl font-serif font-black text-gray-900 dark:text-white tracking-widest uppercase">
-                    {{ $page.props.store_settings.home_marquee_text || 'E.E.W TECHNOLOGY LTD SHOP NOW' }}
+                <h2 class="text-sm md:text-3xl font-serif font-black text-gray-900 dark:text-white tracking-widest uppercase">
+                    {{ $page.props.store_settings.home_marquee_text || 'SHOP NOW' }}
                 </h2>
             </div>
         </section>
