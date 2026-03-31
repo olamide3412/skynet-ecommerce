@@ -120,6 +120,8 @@ class ProductController extends Controller
 
         if ($request->hasFile('image')) {
             $validated['image'] = $request->file('image')->store('products', 'public');
+        } else {
+            unset($validated['image']);
         }
 
         if ($request->hasFile('images')) {
@@ -128,6 +130,8 @@ class ProductController extends Controller
                 $paths[] = $file->store('products', 'public');
             }
             $validated['images'] = $paths;
+        } else {
+            unset($validated['images']);
         }
 
         return $validated;
