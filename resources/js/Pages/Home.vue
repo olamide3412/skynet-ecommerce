@@ -61,48 +61,50 @@ onUnmounted(() => {
     <Head :title="'Welcome to ' + ($page.props.store_settings.company_name || 'Skynet Digital Store')" />
     <Layout>
         <!-- Dynamic Hero Slider -->
-        <section v-if="$page.props.store_settings.home_slider_enabled !== '0' && sliders && sliders.length > 0" class="relative bg-gray-900 border-b dark:border-gray-800 overflow-hidden h-[200px] md:h-[300px] lg:h-[400px]">
-            <div v-for="(slider, index) in sliders" :key="slider.id"
-                class="absolute inset-0 transition-opacity duration-1000 ease-in-out"
-                :class="index === currentSlide ? 'opacity-100 z-10' : 'opacity-0 z-0'">
-                <!-- Background Image -->
-                <div class="absolute inset-0">
-                    <img :src="'/storage/' + slider.image_path" class="w-full h-full object-cover object-center" alt="Slider Image" />
-                    <!-- Gradient Overlay (Only if text exists) -->
-                    <div v-if="slider.title || slider.subtitle" class="absolute inset-0 bg-gradient-to-r from-gray-900/80 via-gray-900/40 to-transparent"></div>
-                </div>
-                <!-- Content -->
-                <div v-if="slider.title || slider.subtitle || slider.button_text" class="relative z-20 container mx-auto px-10 h-full flex flex-col justify-center">
-                    <div class="max-w-2xl transform transition-transform duration-1000" :class="index === currentSlide ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'">
-                        <h2 v-if="slider.title" class="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-extrabold text-white leading-tight mb-2 md:mb-3 drop-shadow-lg">
-                            {{ slider.title }}
-                        </h2>
-                        <p v-if="slider.subtitle" class="text-sm md:text-lg font-medium text-gray-100 mb-4 md:mb-6 drop-shadow-md max-w-xl">
-                            {{ slider.subtitle }}
-                        </p>
-                        <Link v-if="slider.button_text && slider.button_link" :href="slider.button_link" class="inline-block bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-6 sm:py-3 sm:px-8 md:py-4 md:px-10 text-sm sm:text-base rounded-full shadow-2xl hover:shadow-blue-600/50 transition-all duration-300 transform hover:-translate-y-1">
-                            {{ slider.button_text }} &rarr;
-                        </Link>
+        <div v-if="$page.props.store_settings.home_slider_enabled !== '0' && sliders && sliders.length > 0" class="container mx-auto px-4 sm:px-6 lg:px-8 py-4 md:py-8">
+            <section class="relative bg-gray-900 border-none overflow-hidden h-[200px] md:h-[300px] lg:h-[450px] rounded-2xl md:rounded-[3rem] shadow-2xl">
+                <div v-for="(slider, index) in sliders" :key="slider.id"
+                    class="absolute inset-0 transition-opacity duration-1000 ease-in-out"
+                    :class="index === currentSlide ? 'opacity-100 z-10' : 'opacity-0 z-0'" >
+                    <!-- Background Image -->
+                    <div class="absolute inset-0">
+                        <img :src="'/storage/' + slider.image_path" class="w-full h-full object-cover object-center" alt="Slider Image" />
+                        <!-- Gradient Overlay -->
+                        <div v-if="slider.title || slider.subtitle" class="absolute inset-0 bg-gradient-to-r from-gray-900/80 via-gray-900/40 to-transparent"></div>
+                    </div>
+                    <!-- Content -->
+                    <div v-if="slider.title || slider.subtitle || slider.button_text" class="relative z-20 container mx-auto px-10 h-full flex flex-col justify-center">
+                        <div class="max-w-2xl transform transition-transform duration-1000" :class="index === currentSlide ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'">
+                            <h2 v-if="slider.title" class="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-extrabold text-white leading-tight mb-2 md:mb-3 drop-shadow-lg">
+                                {{ slider.title }}
+                            </h2>
+                            <p v-if="slider.subtitle" class="text-sm md:text-lg font-medium text-gray-100 mb-4 md:mb-6 drop-shadow-md max-w-xl">
+                                {{ slider.subtitle }}
+                            </p>
+                            <Link v-if="slider.button_text && slider.button_link" :href="slider.button_link" class="inline-block bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-6 sm:py-3 sm:px-8 md:py-4 md:px-10 text-sm sm:text-base rounded-full shadow-2xl transition-all duration-300 transform hover:-translate-y-1">
+                                {{ slider.button_text }} &rarr;
+                            </Link>
+                        </div>
                     </div>
                 </div>
-            </div>
 
-            <!-- Slider Controls -->
-            <button v-if="sliders.length > 1" @click="prevSlide" class="absolute left-2 md:left-6 top-1/2 -translate-y-1/2 z-30 w-10 h-10 md:w-14 md:h-14 flex items-center justify-center rounded-full bg-black/20 hover:bg-black/60 text-white backdrop-blur-md border border-white/20 transition-all">
-                <svg class="w-6 h-6 md:w-8 md:h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
-            </button>
-            <button v-if="sliders.length > 1" @click="nextSlide" class="absolute right-2 md:right-6 top-1/2 -translate-y-1/2 z-30 w-10 h-10 md:w-14 md:h-14 flex items-center justify-center rounded-full bg-black/20 hover:bg-black/60 text-white backdrop-blur-md border border-white/20 transition-all">
-                <svg class="w-6 h-6 md:w-8 md:h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
-            </button>
-
-            <!-- Dots -->
-            <div v-if="sliders.length > 1" class="absolute bottom-6 left-1/2 -translate-x-1/2 z-30 flex gap-2">
-                <button v-for="(_, index) in sliders" :key="'dot-'+index" @click="goToSlide(index)"
-                    class="h-3 rounded-full transition-all duration-300 shadow"
-                    :class="index === currentSlide ? 'bg-blue-500 w-10' : 'bg-white/50 hover:bg-white w-3'">
+                <!-- Slider Controls -->
+                <button v-if="sliders.length > 1" @click="prevSlide" class="absolute left-2 md:left-6 top-1/2 -translate-y-1/2 z-30 w-8 h-8 md:w-12 md:h-12 flex items-center justify-center rounded-full bg-black/20 hover:bg-black/60 text-white backdrop-blur-md border border-white/20 transition-all">
+                    <svg class="w-5 h-5 md:w-6 md:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
                 </button>
-            </div>
-        </section>
+                <button v-if="sliders.length > 1" @click="nextSlide" class="absolute right-2 md:right-6 top-1/2 -translate-y-1/2 z-30 w-8 h-8 md:w-12 md:h-12 flex items-center justify-center rounded-full bg-black/20 hover:bg-black/60 text-white backdrop-blur-md border border-white/20 transition-all">
+                    <svg class="w-5 h-5 md:w-6 md:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+                </button>
+
+                <!-- Dots -->
+                <div v-if="sliders.length > 1" class="absolute bottom-6 left-1/2 -translate-x-1/2 z-30 flex gap-2">
+                    <button v-for="(_, index) in sliders" :key="'dot-'+index" @click="goToSlide(index)"
+                        class="h-2 md:h-3 rounded-full transition-all duration-300 shadow-lg border border-white/30"
+                        :class="index === currentSlide ? 'bg-white w-8 md:w-12' : 'bg-white/40 hover:bg-white/70 w-2 md:w-3'">
+                    </button>
+                </div>
+            </section>
+        </div>
 
         <!-- Static Hero Fallback -->
         <section v-else-if="$page.props.store_settings.hero_enabled !== '0'" class="relative bg-gray-50 dark:bg-gray-900 border-b dark:border-gray-800">

@@ -12,7 +12,7 @@ import FlashMessages from '../Components/FlashMessages.vue';
 <template>
     <div class=" bg-light text-black dark:bg-dark dark:text-white">
         <Navbar />
-        <main class="pt-[70px]"> <!-- Row1 logo ~56px + Row2 search ~52px + Row3 category nav ~40px before 148px -->
+        <main class="pt-[80px]"> <!-- Row1 logo ~56px + Row2 search ~52px + Row3 category nav ~40px before 148px -->
             <slot />
             <WhatsAppButton v-if="!$page.props.auth.user" />
         </main>
