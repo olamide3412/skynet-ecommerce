@@ -39,7 +39,7 @@ class SliderController extends Controller
         $slider->button_text = $validated['button_text'] ?? null;
         $slider->button_link = $validated['button_link'] ?? null;
         $slider->order = $validated['order'] ?? 0;
-        $slider->is_active = $validated['is_active'] ?? true;
+        $slider->is_active = $request->has('is_active') ? $request->boolean('is_active') : true;
         
         $slider->save();
 

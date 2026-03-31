@@ -15,4 +15,8 @@ class Slider extends Model
         'order',
         'is_active',
     ];
+
+    protected $casts = [
+        'is_active' => 'boolean',
+    ];
 }
