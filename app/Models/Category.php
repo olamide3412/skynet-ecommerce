@@ -18,6 +18,7 @@ class Category extends Model
     ];
 
     protected $casts = [
+        'parent_id'       => 'integer',
         'visible_in_menu' => 'boolean',
         'menu_position'   => 'integer',
     ];

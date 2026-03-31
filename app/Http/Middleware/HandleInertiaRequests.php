@@ -73,7 +73,7 @@ class HandleInertiaRequests extends Middleware
                         ->orderBy('menu_position', 'asc')
                 ])
                 ->orderBy('menu_position', 'asc')
-                ->get(['id', 'name', 'slug', 'parent_id', 'menu_position', 'image']),
+                ->get(),
         ];
     }
 

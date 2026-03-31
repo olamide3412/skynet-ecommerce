@@ -16,10 +16,10 @@ class ProductController extends Controller
         $query = Product::with('category')->latest();
 
         if ($search = $request->input('search')) {
-            $query->where(function($q) use ($search) {
+            $query->where(function ($q) use ($search) {
                 $q->where('name', 'like', "%{$search}%")
-                  ->orWhere('sku', 'like', "%{$search}%")
-                  ->orWhere('url_key', 'like', "%{$search}%");
+                    ->orWhere('sku', 'like', "%{$search}%")
+                    ->orWhere('url_key', 'like', "%{$search}%");
             });
         }
 
@@ -32,13 +32,10 @@ class ProductController extends Controller
         }
 
         return Inertia::render('Admin/Products/Index', [
-            'products'       => $query->paginate(15)->withQueryString(),
-            'categories'     => Category::whereNull('parent_id')
-                ->with(['children' => fn($q) => $q->orderBy('name')])
-                ->orderBy('name')
-                ->get(['id','name','parent_id']),
+            'products' => $query->paginate(15)->withQueryString(),
+            'categories' => Category::with('attributes')->orderBy('name')->get(['id', 'name']),
             'store_settings' => \App\Models\StoreSetting::allAsArray(),
-            'filters'        => $request->only(['search', 'category_id', 'status'])
+            'filters' => $request->only(['search', 'category_id', 'status'])
         ]);
     }
 
@@ -48,9 +45,11 @@ class ProductController extends Controller
         $q = trim($request->get('q', ''));
         $exclude = (int) $request->get('exclude', 0);
 
-        $query = Product::orderBy('name')->select('id','name','image','url_key');
-        if ($q) $query->where('name', 'like', '%' . $q . '%');
-        if ($exclude) $query->where('id', '!=', $exclude);
+        $query = Product::orderBy('name')->select('id', 'name', 'image', 'url_key');
+        if ($q)
+            $query->where('name', 'like', '%' . $q . '%');
+        if ($exclude)
+            $query->where('id', '!=', $exclude);
 
         return response()->json($query->limit(15)->get());
     }
@@ -60,7 +59,7 @@ class ProductController extends Controller
     {
         $ids = array_filter(explode(',', $request->get('ids', '')), 'is_numeric');
         return response()->json(
-            Product::whereIn('id', $ids)->select('id','name','image','url_key')->get()
+            Product::whereIn('id', $ids)->select('id', 'name', 'image', 'url_key')->get()
         );
     }
 
@@ -68,32 +67,32 @@ class ProductController extends Controller
     {
         $uniqueSuffix = $isUpdate ? ",{$product->id}" : '';
         return [
-            'name'               => 'required|string|max:255',
-            'category_id'        => 'required|exists:categories,id',
-            'short_description'  => 'nullable|string',
-            'description'        => 'nullable|string',
-            'url_key'            => "required|string|max:255|unique:products,url_key{$uniqueSuffix}",
-            'product_number'     => "nullable|string|max:100|unique:products,product_number{$uniqueSuffix}",
-            'sku'                => "nullable|string|max:100|unique:products,sku{$uniqueSuffix}",
-            'price'              => 'required|numeric|min:0',
-            'cost_price'         => 'nullable|numeric|min:0',
-            'discount_price'     => 'nullable|numeric|min:0',
-            'special_price'      => 'nullable|numeric|min:0',
+            'name' => 'required|string|max:255',
+            'category_id' => 'required|exists:categories,id',
+            'short_description' => 'nullable|string',
+            'description' => 'nullable|string',
+            'url_key' => "required|string|max:255|unique:products,url_key{$uniqueSuffix}",
+            'product_number' => "nullable|string|max:100|unique:products,product_number{$uniqueSuffix}",
+            'sku' => "nullable|string|max:100|unique:products,sku{$uniqueSuffix}",
+            'price' => 'required|numeric|min:0',
+            'cost_price' => 'nullable|numeric|min:0',
+            'discount_price' => 'nullable|numeric|min:0',
+            'special_price' => 'nullable|numeric|min:0',
             'special_price_from' => 'nullable|date',
-            'special_price_to'   => 'nullable|date|after_or_equal:special_price_from',
-            'stock'              => 'required|integer|min:0',
-            'is_new'             => 'boolean',
-            'is_featured'        => 'boolean',
+            'special_price_to' => 'nullable|date|after_or_equal:special_price_from',
+            'stock' => 'required|integer|min:0',
+            'is_new' => 'boolean',
+            'is_featured' => 'boolean',
             'visible_individually' => 'boolean',
-            'status'             => 'boolean',
-            'show_stock_level'    => 'boolean',
-            'related_products'    => 'nullable|array',
-            'related_products.*'  => 'exists:products,id',
-            'variants'           => 'nullable|string',
-            'attributes'         => 'nullable|string',
-            'image'              => 'nullable|image|max:3072',
-            'images'             => 'nullable|array|max:10',
-            'images.*'           => 'image|max:3072',
+            'status' => 'boolean',
+            'show_stock_level' => 'boolean',
+            'related_products' => 'nullable|array',
+            'related_products.*' => 'exists:products,id',
+            'variants' => 'nullable|string',
+            'attributes' => 'nullable|string',
+            'image' => 'nullable|image|max:3072',
+            'images' => 'nullable|array|max:10',
+            'images.*' => 'image|max:3072',
         ];
     }
 
